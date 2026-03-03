@@ -59,7 +59,9 @@ class DrawController {
             val _actions = actions.value.toMutableList()
             val _undoneActions = undoneActions.value.toMutableList()
 
-            _undoneActions.add(_actions.removeLast())
+//            _undoneActions.add(_actions.removeLast())
+            val last = _actions.removeAt(_actions.lastIndex)
+            _undoneActions.add(last)
 
             actions.value = _actions
             undoneActions.value = _undoneActions
@@ -72,7 +74,9 @@ class DrawController {
             val _actions = actions.value.toMutableList()
             val _undoneActions = undoneActions.value.toMutableList()
 
-            _actions.add(_undoneActions.removeLast())
+//            _actions.add(_undoneActions.removeLast())
+            val last = _undoneActions.removeAt(_undoneActions.lastIndex)
+            _actions.add(last)
 
             actions.value = _actions
             undoneActions.value = _undoneActions

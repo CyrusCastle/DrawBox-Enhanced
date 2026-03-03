@@ -1,7 +1,8 @@
 plugins {
-    alias(libs.plugins.compose)
+    alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.composeCompiler)
 }
 
 group = Library.group
@@ -26,15 +27,12 @@ android {
             isMinifyEnabled = false
         }
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
 }
 
 dependencies {
     implementation(project(":drawbox"))
     implementation(libs.androidx.activityCompose)
-    implementation(compose.material)
+    implementation(libs.material)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.coreKtx)
 }
