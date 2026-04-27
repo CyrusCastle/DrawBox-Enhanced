@@ -6,6 +6,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
@@ -17,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import io.github.markyav.drawbox.box.DrawBox
 import io.github.markyav.drawbox.controller.DrawBoxSubscription
 import io.github.markyav.drawbox.controller.DrawController
+import io.github.markyav.drawbox.model.CanvasTool
 
 @Composable
 internal fun ExpandedDrawingScreen(
@@ -50,6 +53,12 @@ internal fun ExpandedDrawingScreen(
                 }
                 IconButton(onClick = drawController::reset, enabled = enableUndo || enableRedo) {
                     Icon(imageVector = Icons.Default.Clear, contentDescription = "reset")
+                }
+                TextButton(onClick = { drawController.canvasTool.value = CanvasTool.BRUSH }) {
+                    Text("Brush")
+                }
+                TextButton(onClick = { drawController.canvasTool.value = CanvasTool.ERASER }) {
+                    Text("Eraser")
                 }
             }
         }

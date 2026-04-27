@@ -17,6 +17,7 @@ kotlin {
             dependencies {
                 implementation(project(":drawbox"))
                 implementation(compose.desktop.currentOs)
+                implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
             }
         }
         val jvmTest by getting

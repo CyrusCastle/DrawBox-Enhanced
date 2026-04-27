@@ -13,14 +13,13 @@ android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         applicationId = "io.github.markyav.sample"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+        minSdk = libs.versions.android.minSdk.get().toInt()
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     buildTypes {
         getByName("release") {
@@ -35,4 +34,5 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.coreKtx)
+    implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
 }
