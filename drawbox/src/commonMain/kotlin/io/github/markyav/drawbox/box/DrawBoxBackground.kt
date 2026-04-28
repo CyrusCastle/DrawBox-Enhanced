@@ -25,6 +25,7 @@ fun DrawBoxBackground(
             modifier = modifier,
             contentDescription = null
         )
+        is DrawBoxBackground.ComposableBackground -> background.content
         is DrawBoxBackground.NoBackground -> { }
     }
 }
