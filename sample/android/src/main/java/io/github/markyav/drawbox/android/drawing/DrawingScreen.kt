@@ -16,9 +16,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import io.github.markyav.drawbox.controller.BitmapDrawController
 import io.github.markyav.drawbox.controller.DrawBoxBackground
 import io.github.markyav.drawbox.controller.DrawBoxSubscription
-import io.github.markyav.drawbox.controller.DrawController
 import kotlinx.coroutines.flow.collectLatest
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.collectLatest
 fun DrawingScreen(
     bitmapCallback: (ImageBitmap) -> Unit,
 ) {
-    val drawController = remember { DrawController() }
+    val drawController = remember { BitmapDrawController() }
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicturePreview()
     ) { bitmap ->
@@ -54,5 +54,4 @@ fun DrawingScreen(
         }
         ExpandedDrawingScreen(drawController)
     }
-
 }

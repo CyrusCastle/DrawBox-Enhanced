@@ -26,6 +26,10 @@ internal fun ExpandedDrawingScreen(
     drawController: DrawController,
 ) {
     val bitmap by remember { drawController.getBitmap(500, DrawBoxSubscription.FinishDrawingUpdate) }.collectAsState()
+    val undoCount by drawController.undoCount.collectAsState()
+    val redoCount by drawController.redoCount.collectAsState()
+    val enableUndo by remember { derivedStateOf { undoCount > 0 } }
+    val enableRedo by remember { derivedStateOf { redoCount > 0 } }
 
     Column {
         Image(bitmap = bitmap, modifier = Modifier
@@ -43,8 +47,6 @@ internal fun ExpandedDrawingScreen(
                     .weight(1f, fill = false),
             )
             Row {
-                val enableUndo by remember { derivedStateOf { drawController.undoCount.value > 0 } }
-                val enableRedo by remember { derivedStateOf { drawController.redoCount.value > 0 } }
                 IconButton(onClick = drawController::undo, enabled = enableUndo) {
                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "undo")
                 }
@@ -64,11 +66,3 @@ internal fun ExpandedDrawingScreen(
         }
     }
 }
-
-/*@AndroidPreviewDevices
-@Composable
-fun ExpandedDrawingScreenPreview() {
-    MobiSketchTheme {
-        ExpandedDrawingScreen()
-    }
-}*/
