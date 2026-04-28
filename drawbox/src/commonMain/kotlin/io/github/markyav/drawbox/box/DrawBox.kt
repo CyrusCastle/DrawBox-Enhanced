@@ -1,24 +1,20 @@
 package io.github.markyav.drawbox.box
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import io.github.markyav.drawbox.controller.DrawBoxSubscription
 import io.github.markyav.drawbox.controller.DrawController
-import io.github.markyav.drawbox.controller.OpenedImage
-import io.github.markyav.drawbox.model.PathWrapper
-import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun DrawBox(
     controller: DrawController,
     modifier: Modifier = Modifier,
-    backgroundContent: (@Composable BoxScope.() -> Unit)? = null
 ) {
-    val path: StateFlow<List<PathWrapper>> = remember { controller.getPathWrappersForDrawbox(DrawBoxSubscription.DynamicUpdate) }
-    val openedImage: StateFlow<OpenedImage> = remember { controller.getOpenImageForDrawbox(null) }
+    val bitmap by controller.getBitmap(null, DrawBoxSubscription.DynamicUpdate).collectAsState()
     val background by controller.background.collectAsState()
     val canvasOpacity by controller.canvasOpacity.collectAsState()
 
@@ -27,10 +23,8 @@ fun DrawBox(
             background = background,
             modifier = Modifier.fillMaxSize(),
         )
-        backgroundContent?.invoke(this@Box)
         DrawBoxCanvas(
-            pathListWrapper = path,
-            openedImage = openedImage,
+            bitmap = bitmap,
             alpha = canvasOpacity,
             onSizeChanged = controller::connectToDrawBox,
             onTap = controller::onTap,
