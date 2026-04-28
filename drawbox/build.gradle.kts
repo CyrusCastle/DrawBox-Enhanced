@@ -22,7 +22,7 @@ kotlin {
         }
         publishLibraryVariants("release")
     }
-    jvm("desktop")
+    jvm()
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
