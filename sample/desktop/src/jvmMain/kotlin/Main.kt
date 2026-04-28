@@ -1,35 +1,46 @@
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Slider
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.runtime.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import io.github.markyav.drawbox.box.DrawBox
-import io.github.markyav.drawbox.controller.DrawBoxBackground
-import io.github.markyav.drawbox.controller.DrawBoxSubscription
-import io.github.markyav.drawbox.controller.DrawController
+import uk.codecymru.drawbox.box.DrawBox
+import uk.codecymru.drawbox.controller.BitmapDrawController
+import uk.codecymru.drawbox.controller.DrawBoxBackground
+import uk.codecymru.drawbox.controller.DrawBoxSubscription
+import uk.codecymru.drawbox.model.CanvasTool
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
-        val controller = remember { DrawController() }
-        val bitmap by remember { controller.getBitmap(250, DrawBoxSubscription.DynamicUpdate) }.collectAsState()
-        val bitmapFinishDrawingUpdate by remember { controller.getBitmap(250, DrawBoxSubscription.FinishDrawingUpdate) }.collectAsState()
+        val controller = remember { BitmapDrawController() }
+        val bitmap by controller.getBitmap(null, DrawBoxSubscription.DynamicUpdate).collectAsState()
+        val bitmapFinishDrawingUpdate by controller.getBitmap(null, DrawBoxSubscription.FinishDrawingUpdate).collectAsState()
 
-        val undoCount by controller.undoCount.collectAsState()
-        val redoCount by controller.redoCount.collectAsState()
-        val enableUndo by remember { derivedStateOf { undoCount > 0 } }
-        val enableRedo by remember { derivedStateOf { redoCount > 0 } }
+        val enableUndo by controller.canUndo.collectAsState()
+        val enableRedo by controller.canRedo.collectAsState()
+        val tool by controller.canvasTool.collectAsState()
 
-        val strokeWith by controller.strokeWidth.collectAsState()
+        val strokeWidth by controller.strokeWidth.collectAsState()
         val canvasOpacity by controller.canvasOpacity.collectAsState()
         val background by controller.background.collectAsState()
 
@@ -51,11 +62,24 @@ fun main() = application {
                         Icon(imageVector = Icons.Default.Clear, contentDescription = "reset")
                     }
                 }
+                Row(modifier = Modifier.padding(end = 8.dp)){
+                    Column(modifier = Modifier.weight(2f, false)){
+                        Text("Tool: $tool")
+                        Row {
+                            TextButton(onClick = { controller.canvasTool.value = CanvasTool.BRUSH }) {
+                                Text("Brush")
+                            }
+                            TextButton(onClick = { controller.canvasTool.value = CanvasTool.ERASER }) {
+                                Text("Eraser")
+                            }
+                        }
+                    }
+                }
                 Row(modifier = Modifier.padding(end = 8.dp)) {
                     Column(modifier = Modifier.weight(2f, false)) {
                         Text("Stroke width")
                         Slider(
-                            value = strokeWith,
+                            value = strokeWidth,
                             onValueChange = { controller.strokeWidth.value = it },
                             valueRange = 1f..100f
                         )
@@ -97,9 +121,7 @@ fun main() = application {
                 DrawBox(
                     controller = controller,
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .aspectRatio(1f)
-                        .padding(100.dp)
+                        .size(250.dp)
                         .border(width = 1.dp, color = Color.Blue),
                 )
             }

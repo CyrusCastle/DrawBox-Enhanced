@@ -1,35 +1,67 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.compose)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
     alias(libs.plugins.androidLibrary)
     id("convention-publication")
 }
 
-group = Library.group
-version = Library.version
+group = Library.GROUP
+version = Library.VERSION
 
 kotlin {
+    // Android
     androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "1.8"
-            }
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_1_8)
         }
         publishLibraryVariants("release")
     }
-    jvm("desktop") {
-        jvmToolchain(11)
+
+    // JVM
+    jvm()
+
+    // Web
+    js {
+        browser()
+        binaries.executable()
     }
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+        binaries.executable()
+    }
+
+    // iOS
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "Drawbox-Enhanced"
+            isStatic = true
+        }
+    }
+
+    // etc
     sourceSets {
         commonMain.dependencies {
-            api(compose.runtime)
-            api(compose.foundation)
+            implementation(libs.runtime)
+            implementation(libs.foundation)
         }
     }
 }
 
 android {
-    namespace = "io.github.markyav.drawbox"
+    namespace = "uk.codecymru.drawbox"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
@@ -38,4 +70,8 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+}
+
+signing {
+    isRequired = !project.hasProperty("signing.skip")
 }
