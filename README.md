@@ -1,7 +1,9 @@
 ![Kotlin](https://img.shields.io/badge/Kotlin-7F52FF?&style=flat&logo=kotlin&logoColor=white)
-![Platform JVM](https://img.shields.io/badge/platform-JVM-blue)
-![Platform Android](https://img.shields.io/badge/platform-Android-green)
-![Platform WASM](https://img.shields.io/badge/platform-WASM-yellow)
+
+![Platform Android](https://img.shields.io/badge/platform-Android-green?logo=android)
+![Platform iOS](https://img.shields.io/badge/platform-iOS-lightgrey?logo=apple)
+![Platform JVM](https://img.shields.io/badge/platform-JVM-blue?logo=openjdk)
+![Platform WASM](https://img.shields.io/badge/platform-WASM%20%2F%20JS-yellow?logo=javascript)
 
 # DrawBox Enhanced
 Building on the work of Mark Yavorskyi's [DrawBox](https://github.com/MarkYav/DrawBox), DrawBox Enhanced is a Compose Multiplatform library to quickly and easily provide a canvas for your users to draw on.
