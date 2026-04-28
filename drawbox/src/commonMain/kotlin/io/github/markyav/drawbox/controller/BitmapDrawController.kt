@@ -237,15 +237,17 @@ class BitmapDrawController: DrawController {
                 }
             }
 
-            val paint = createPaint(
-                color.value,
-                strokeWidth.value,
-                opacity.value,
-                canvasTool.value
-            )
+            if (subscription is DrawBoxSubscription.DynamicUpdate){
+                val paint = createPaint(
+                    color.value,
+                    strokeWidth.value,
+                    opacity.value,
+                    canvasTool.value
+                )
 
-            currentAction.forEach { (from, to) ->
-                canvas.drawLine(from, to, paint)
+                currentAction.forEach { (from, to) ->
+                    canvas.drawLine(from, to, paint)
+                }
             }
 
             bitmap
