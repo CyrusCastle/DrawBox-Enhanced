@@ -29,9 +29,8 @@ class PathDrawController: DrawController {
     ///////////////////
     // DERIVED STATE //
     ///////////////////
-    override val undoCount = actions.mapState { it.size }
-
-    override val redoCount = undoneActions.mapState { it.size }
+    override val canUndo = actions.mapState { it.isNotEmpty() }
+    override val canRedo = undoneActions.mapState { it.isNotEmpty() }
 
     ////////////////////
     // BRUSH SETTINGS //

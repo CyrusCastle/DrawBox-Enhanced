@@ -26,10 +26,8 @@ internal fun ExpandedDrawingScreen(
     drawController: DrawController,
 ) {
     val bitmap by remember { drawController.getBitmap(500, DrawBoxSubscription.FinishDrawingUpdate) }.collectAsState()
-    val undoCount by drawController.undoCount.collectAsState()
-    val redoCount by drawController.redoCount.collectAsState()
-    val enableUndo by remember { derivedStateOf { undoCount > 0 } }
-    val enableRedo by remember { derivedStateOf { redoCount > 0 } }
+    val enableUndo by drawController.canUndo.collectAsState()
+    val enableRedo by drawController.canRedo.collectAsState()
 
     Column {
         Image(bitmap = bitmap, modifier = Modifier

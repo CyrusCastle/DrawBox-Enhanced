@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -37,10 +36,8 @@ fun main() = application {
         val bitmap by controller.getBitmap(null, DrawBoxSubscription.DynamicUpdate).collectAsState()
         val bitmapFinishDrawingUpdate by controller.getBitmap(null, DrawBoxSubscription.FinishDrawingUpdate).collectAsState()
 
-        val undoCount by controller.undoCount.collectAsState()
-        val redoCount by controller.redoCount.collectAsState()
-        val enableUndo by remember { derivedStateOf { undoCount > 0 } }
-        val enableRedo by remember { derivedStateOf { redoCount > 0 } }
+        val enableUndo by controller.canUndo.collectAsState()
+        val enableRedo by controller.canRedo.collectAsState()
         val tool by controller.canvasTool.collectAsState()
 
         val strokeWidth by controller.strokeWidth.collectAsState()

@@ -36,8 +36,9 @@ class BitmapDrawController: DrawController {
     ///////////////////
     // DERIVED STATE //
     ///////////////////
-    override val undoCount = _actions.mapState { it.size }
-    override val redoCount = _undoneActions.mapState { it.size }
+
+    override val canUndo = _actions.mapState { it.isNotEmpty() }
+    override val canRedo = _undoneActions.mapState { it.isNotEmpty() }
 
     ////////////////////
     // BRUSH SETTINGS //

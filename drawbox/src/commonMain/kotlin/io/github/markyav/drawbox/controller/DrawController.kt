@@ -12,12 +12,11 @@ interface DrawController {
     ///////////////////
     // DERIVED STATE //
     ///////////////////
+    /** Can we currently undo? */
+    val canRedo: StateFlow<Boolean>
 
-    /** How many actions are available to undo */
-    val undoCount: StateFlow<Int>
-
-    /** How many actions are available to redo */
-    val redoCount: StateFlow<Int>
+    /** Can we currently redo? */
+    val canUndo: StateFlow<Boolean>
 
     ////////////////////
     // BRUSH SETTINGS //
