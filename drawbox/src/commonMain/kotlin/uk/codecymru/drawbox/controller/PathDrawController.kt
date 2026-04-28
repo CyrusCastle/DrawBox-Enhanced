@@ -74,7 +74,7 @@ class PathDrawController: DrawController {
             size.height > 0 &&
             size.width == size.height
         ) {
-            state.value = DrawBoxConnectionState.Connected(size = size.width)
+            state.value = DrawBoxConnectionState.Connected(size)
         }
     }
 
@@ -128,7 +128,7 @@ class PathDrawController: DrawController {
         (state.value as? DrawBoxConnectionState.Connected)?.let {
             require(activeDrawingPath.value != null)
             val list = activeDrawingPath.value!!.toMutableList()
-            list.add(offset.div(it.size.toFloat()))
+            list.add(offset.div(it.size.width.toFloat()))
             activeDrawingPath.value = list
         }
     }
@@ -137,7 +137,7 @@ class PathDrawController: DrawController {
     internal fun insertNewPath(offset: Offset) {
         (state.value as? DrawBoxConnectionState.Connected)?.let {
             require(activeDrawingPath.value == null)
-            activeDrawingPath.value = listOf(offset.div(it.size.toFloat()))
+            activeDrawingPath.value = listOf(offset.div(it.size.width.toFloat()))
             undoneActions.value = emptyList()
         }
     }
@@ -149,14 +149,14 @@ class PathDrawController: DrawController {
 
             // We need more than one point to draw a proper path, but we can point to the same place twice
             if (activeDrawingPath.value!!.size == 1){
-                updateLatestPath(activeDrawingPath.value!![0].times(it.size.toFloat()))
+                updateLatestPath(activeDrawingPath.value!![0].times(it.size.width.toFloat()))
             }
 
             val pathWrapper = PathWrapper(
                 points = activeDrawingPath.value!!,
                 strokeColor = color.value,
                 alpha = opacity.value,
-                strokeWidth = strokeWidth.value.div(it.size.toFloat()),
+                strokeWidth = strokeWidth.value.div(it.size.width.toFloat()),
             )
             _actions.add(CanvasAction.Draw(pathWrapper))
 
@@ -177,7 +177,7 @@ class PathDrawController: DrawController {
             for (pw in actions.value) {
                 if (pw !is CanvasAction.Draw) continue
 
-                if (pw.path.points.any { p -> _erasedPath.any { e -> e.minus(p).getDistance() < strokeWidth.value.div(it.size.toFloat()) } }) {
+                if (pw.path.points.any { p -> _erasedPath.any { e -> e.minus(p).getDistance() < strokeWidth.value.div(it.size.width.toFloat()) } }) {
                     toRemove.add(pw.path)
                 }
             }
@@ -262,7 +262,7 @@ class PathDrawController: DrawController {
                     points = activeDrawingPath.value ?: emptyList(),
                     strokeColor = if (canvasTool.value == CanvasTool.BRUSH) color.value else Color.Red,
                     alpha = if (canvasTool.value == CanvasTool.BRUSH) opacity.value else 0.8f,
-                    strokeWidth = strokeWidth.value.div(it.size.toFloat()),
+                    strokeWidth = strokeWidth.value.div(it.size.width.toFloat()),
                 )
                 _a.addNotNull(pathWrapper)
             }
@@ -273,7 +273,7 @@ class PathDrawController: DrawController {
     private fun getOpenImageForDrawbox(size: Int?): StateFlow<OpenedImage> {
         return combineStates(openedImage, state) { image, connectionState ->
             val bitmap = image ?: return@combineStates OpenedImage.None
-            val width = size ?: (connectionState as? DrawBoxConnectionState.Connected)?.size ?: 1
+            val width = size ?: (connectionState as? DrawBoxConnectionState.Connected)?.size?.width ?: 1
 
             OpenedImage.Image(
                 image = bitmap,
@@ -284,7 +284,7 @@ class PathDrawController: DrawController {
 
     override fun getBitmap(size: Int?, subscription: DrawBoxSubscription): StateFlow<ImageBitmap> {
         val path = getDrawPath(subscription)
-        val width = size ?: (state.value as? DrawBoxConnectionState.Connected)?.size ?: 1
+        val width = size ?: (state.value as? DrawBoxConnectionState.Connected)?.size?.width ?: 1
 
         return combineStates(getOpenImageForDrawbox(width), path) { openImage, p ->
             val bitmap = ImageBitmap(width, width, ImageBitmapConfig.Argb8888)

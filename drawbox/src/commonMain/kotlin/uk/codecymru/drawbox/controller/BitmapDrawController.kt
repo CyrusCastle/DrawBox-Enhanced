@@ -70,7 +70,7 @@ class BitmapDrawController: DrawController {
 
     override fun connectToDrawBox(size: IntSize) {
         if (size.width > 0 && size.height > 0) {
-            state.value = DrawBoxConnectionState.Connected(size = size.width)
+            state.value = DrawBoxConnectionState.Connected(size = size)
 
             val newBitmap = ImageBitmap(size.width, size.height, ImageBitmapConfig.Argb8888)
             internalBitmap = newBitmap
@@ -186,6 +186,8 @@ class BitmapDrawController: DrawController {
                 action.paintOptions.tool
             )
             action.points.forEach { (from, to) ->
+                val fX = from.x.coerceIn(0f, (state.value as DrawBoxConnectionState.Connected).size.width.toFloat())
+
                 canvas.drawLine(from, to, paint)
             }
         }
@@ -219,11 +221,16 @@ class BitmapDrawController: DrawController {
     // SUBSCRIPTION & BITMAP //
     ///////////////////////////
 
+    // TODO perhaps this whole method should use an IntOffset?(?)
     override fun getBitmap(size: Int?, subscription: DrawBoxSubscription): StateFlow<ImageBitmap> {
-        val width = size ?: (state.value as? DrawBoxConnectionState.Connected)?.size ?: 1
+        val canvasSize = when {
+            size != null -> IntSize(size, size)
+            state.value is DrawBoxConnectionState.Connected -> (state.value as DrawBoxConnectionState.Connected).size
+            else -> IntSize(1, 1)
+        }
 
         return combineStates(_actions, _currentAction) { actions, currentAction ->
-            val bitmap = ImageBitmap(width, width, ImageBitmapConfig.Argb8888)
+            val bitmap = ImageBitmap(canvasSize.width, canvasSize.height, ImageBitmapConfig.Argb8888)
             val canvas = Canvas(bitmap)
 
             actions.forEach { action ->
