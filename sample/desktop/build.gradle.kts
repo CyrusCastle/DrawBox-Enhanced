@@ -6,8 +6,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
-group = Library.group
-version = Library.version
+group = Library.GROUP
+version = Library.VERSION
 
 
 kotlin {
@@ -29,8 +29,8 @@ compose.desktop {
         mainClass = "MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = Library.name
-            packageVersion = Library.version
+            packageName = Library.NAME
+            packageVersion = Library.VERSION
         }
     }
 }

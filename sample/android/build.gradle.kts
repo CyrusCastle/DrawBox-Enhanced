@@ -5,14 +5,14 @@ plugins {
     alias(libs.plugins.composeCompiler)
 }
 
-group = Library.group
-version = Library.version
+group = Library.GROUP
+version = Library.VERSION
 
 android {
-    namespace = "io.github.markyav.drawbox.android"
+    namespace = "uk.codecymru.drawbox.android"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
-        applicationId = "io.github.markyav.sample"
+        applicationId = "uk.codecymru.drawbox.sample"
         versionCode = 1
         versionName = "1.0"
         minSdk = libs.versions.android.minSdk.get().toInt()

@@ -60,25 +60,31 @@ publishing {
 
         // Provide artifacts information requited by Maven Central
         pom {
-            name.set(Library.name)
-            description.set(Library.description)
-            url.set(Library.url)
+            name.set(Library.NAME)
+            description.set(Library.DESCRIPTION)
+            url.set(Library.URL)
 
             licenses {
                 license {
-                    name.set(Library.License.name)
-                    url.set(Library.License.url)
+                    name.set(Library.License.NAME)
+                    url.set(Library.License.URL)
                 }
             }
             developers {
                 developer {
-                    id.set(Library.Author.id)
-                    name.set(Library.Author.name)
-                    email.set(Library.Author.email)
+                    id.set(Library.Author.ID)
+                    name.set(Library.Author.NAME)
+                    email.set(Library.Author.EMAIL)
+                }
+
+                developer {
+                    id.set(Library.OriginalAuthor.ID)
+                    name.set(Library.OriginalAuthor.NAME)
+                    email.set(Library.OriginalAuthor.EMAIL)
                 }
             }
             scm {
-                url.set(Library.url)
+                url.set(Library.URL)
             }
         }
     }

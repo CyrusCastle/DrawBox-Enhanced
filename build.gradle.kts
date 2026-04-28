@@ -1,5 +1,5 @@
-group = Library.group
-version = Library.version
+group = Library.GROUP
+version = Library.VERSION
 
 plugins {
     //trick: for the same plugin versions in all sub-modules

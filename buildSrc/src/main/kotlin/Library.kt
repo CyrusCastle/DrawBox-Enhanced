@@ -1,20 +1,25 @@
 object Library {
-    val name = "DrawBox"
-    val description = "Multiplatform drawing library based on Compose Multiplatform!"
-    val url = "https://github.com/MarkYav/DrawBox"
+    const val NAME = "DrawBox-Enhanced"
+    const val DESCRIPTION = "Compose Multiplatform drawing library!"
+    const val URL = "https://github.com/CyrusCastle/DrawBox-Enhanced"
 
-    val group = "io.github.markyav.drawbox"
-    val artifact = "drawbox"
-    val version = "1.5.0"
+    const val GROUP = "uk.codecymru.drawbox"
+    const val VERSION = "1.9.9"
 
     object License {
-        val name = "Apache-2.0"
-        val url = "https://opensource.org/license/apache-2-0/"
+        const val NAME = "Apache-2.0"
+        const val URL = "https://opensource.org/license/apache-2-0/"
+    }
+
+    object OriginalAuthor {
+        const val ID = "MarkYav"
+        const val NAME = "Mark Yavorskyi"
+        const val EMAIL = "yavorskiymark@gmail.com"
     }
 
     object Author {
-        val id = "MarkYav"
-        val name = "Mark Yavorskyi"
-        val email = "yavorskiymark@gmail.com"
+        const val ID = "CyrusCastle"
+        const val NAME = "Cyrus Castle"
+        const val EMAIL = "cyrus@codecymru.uk"
     }
 }
