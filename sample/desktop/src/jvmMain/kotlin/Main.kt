@@ -24,11 +24,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import io.github.markyav.drawbox.box.DrawBox
-import io.github.markyav.drawbox.controller.BitmapDrawController
-import io.github.markyav.drawbox.controller.DrawBoxBackground
-import io.github.markyav.drawbox.controller.DrawBoxSubscription
-import io.github.markyav.drawbox.model.CanvasTool
+import uk.codecymru.drawbox.box.DrawBox
+import uk.codecymru.drawbox.controller.BitmapDrawController
+import uk.codecymru.drawbox.controller.DrawBoxBackground
+import uk.codecymru.drawbox.controller.DrawBoxSubscription
+import uk.codecymru.drawbox.model.CanvasTool
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
