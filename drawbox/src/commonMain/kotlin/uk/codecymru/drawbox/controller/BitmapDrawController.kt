@@ -1,5 +1,6 @@
 package uk.codecymru.drawbox.controller
 
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Canvas
@@ -10,6 +11,7 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PaintingStyle
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import uk.codecymru.drawbox.model.CanvasTool
 import uk.codecymru.drawbox.util.combineStates
@@ -186,11 +188,22 @@ class BitmapDrawController: DrawController {
                 action.paintOptions.tool
             )
             action.points.forEach { (from, to) ->
-                val fX = from.x.coerceIn(0f, (state.value as DrawBoxConnectionState.Connected).size.width.toFloat())
-
                 canvas.drawLine(from, to, paint)
             }
         }
+
+        // Should we remove any points that have been cropped out?
+        val size = (state.value as DrawBoxConnectionState.Connected).size
+        val maxWidth = size.width.toFloat()
+        val maxHeight = size.height.toFloat()
+
+        _actions.value = _actions.value.map { action ->
+            action.copy(
+                points = action.points.filter { (from, to) ->
+                    from.x <= maxWidth && from.y <= maxHeight && to.x <= maxWidth && to.y <= maxHeight
+                }
+            )
+        }.filter { it.points.isNotEmpty() }
     }
 
     /////////////////
