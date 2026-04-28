@@ -12,23 +12,46 @@ plugins {
     id("convention-publication")
 }
 
-group = Library.group
-version = Library.version
+group = Library.GROUP
+version = Library.VERSION
 
 kotlin {
+    // Android
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_1_8)
         }
         publishLibraryVariants("release")
     }
+
+    // JVM
     jvm()
+
+    // Web
+    js {
+        browser()
+        binaries.executable()
+    }
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser()
         binaries.executable()
     }
+
+    // iOS
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "Drawbox-Enhanced"
+            isStatic = true
+        }
+    }
+
+    // etc
     sourceSets {
         commonMain.dependencies {
             implementation(libs.runtime)
@@ -38,7 +61,7 @@ kotlin {
 }
 
 android {
-    namespace = "io.github.markyav.drawbox"
+    namespace = "uk.codecymru.drawbox"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
