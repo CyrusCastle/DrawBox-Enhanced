@@ -69,7 +69,7 @@ class BitmapDrawController: DrawController {
     ///////////////////
 
     override fun connectToDrawBox(size: IntSize) {
-        if (size.width > 0 && size.height > 0 && size.width == size.height) { // TODO does this really need to be a box like that? hm
+        if (size.width > 0 && size.height > 0) {
             state.value = DrawBoxConnectionState.Connected(size = size.width)
 
             val newBitmap = ImageBitmap(size.width, size.height, ImageBitmapConfig.Argb8888)
