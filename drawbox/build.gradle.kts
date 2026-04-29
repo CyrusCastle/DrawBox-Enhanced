@@ -9,7 +9,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.androidLibrary)
-    id("convention-publication")
+    id("com.vanniktech.maven.publish") version "0.36.0"
 }
 
 group = Library.GROUP
@@ -72,11 +72,46 @@ android {
     }
 }
 
-signing {
-    isRequired = !project.hasProperty("signing.skip")
-}
-
 tasks.withType<AbstractPublishToMaven>().configureEach {
     val signingTasks = tasks.withType<Sign>()
     mustRunAfter(signingTasks)
+}
+
+mavenPublishing {
+    publishToMavenCentral()
+
+    signAllPublications()
+}
+
+mavenPublishing {
+    coordinates(Library.GROUP, Library.NAME, Library.VERSION)
+
+    pom {
+        name.set(Library.NAME)
+        description.set(Library.DESCRIPTION)
+        url.set(Library.URL)
+
+        licenses {
+            license {
+                name.set(Library.License.NAME)
+                url.set(Library.License.URL)
+            }
+        }
+        developers {
+            developer {
+                id.set(Library.Author.ID)
+                name.set(Library.Author.NAME)
+                email.set(Library.Author.EMAIL)
+            }
+
+            developer {
+                id.set(Library.OriginalAuthor.ID)
+                name.set(Library.OriginalAuthor.NAME)
+                email.set(Library.OriginalAuthor.EMAIL)
+            }
+        }
+        scm {
+            url.set(Library.URL)
+        }
+    }
 }
