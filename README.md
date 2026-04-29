@@ -14,6 +14,7 @@ Building on the work of Mark Yavorskyi's [DrawBox](https://github.com/MarkYav/Dr
 - Eraser tool
 - Fill tool
 - Eyedropper tool
+- Spray can tool
 - Undo, redo, or clear all brushstrokes
 - An easy implementation
 

@@ -22,6 +22,9 @@ import kotlinx.coroutines.launch
 import uk.codecymru.drawbox.model.CanvasTool
 import uk.codecymru.drawbox.util.combineStates
 import uk.codecymru.drawbox.util.mapState
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 
 class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawController {
     //////////////////////
@@ -121,6 +124,14 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
                         }
                     )
                 }
+
+                is DrawAction.Spray -> {
+                    action.copy(
+                        points = action.points.filter {
+                            it.x <= maxWidth && it.y <= maxHeight
+                        }
+                    )
+                }
             }
         }.filter { it.points.isNotEmpty() }
     }
@@ -150,17 +161,20 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
         if (!enabled.value) return
 
         if (_currentAction.value.isNotEmpty()) {
-            val action = DrawAction.Path(
-                points = _currentAction.value.toList(),
-                paintOptions = PaintOptions(
-                    color.value,
-                    strokeWidth.value,
-                    opacity.value,
-                    canvasTool.value
-            ))
+            val action = when (canvasTool.value){
+                CanvasTool.BRUSH, CanvasTool.ERASER -> DrawAction.Path(
+                    points = _currentAction.value.toList(),
+                    paintOptions = PaintOptions(
+                        color.value,
+                        strokeWidth.value,
+                        opacity.value,
+                        canvasTool.value
+                ))
+                CanvasTool.SPRAY_CAN -> drawSpraySegment(_currentAction.value.toList().map { it.first })
+                else -> DrawAction.Fill(points = emptyList(), color = Color.Black) // TODO not the best way of doing this
+            }
 
             applyDrawActionToInternalCanvas(action)
-
             _actions.value += action
         }
         lastPoint = null
@@ -204,6 +218,20 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
                     }
                 )
             }
+            is DrawAction.Spray -> {
+                val paint = createPaint(
+                    action.paintOptions.color,
+                    action.paintOptions.strokeWidth,
+                    action.paintOptions.opacity,
+                    action.paintOptions.tool
+                )
+
+                canvas.drawPoints(
+                    pointMode = PointMode.Points,
+                    points = action.points,
+                    paint = paint
+                )
+            }
         }
     }
 
@@ -211,10 +239,40 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
         if (state.value !is DrawBoxConnectionState.Connected) return
 
         when (canvasTool.value){
-            CanvasTool.BRUSH, CanvasTool.ERASER -> _currentAction.value += from to to
+            CanvasTool.BRUSH, CanvasTool.ERASER, CanvasTool.SPRAY_CAN -> _currentAction.value += from to to // TODO WOULD THIS BE BETTER IF currentAction TOOK A REAL ACTION RATHER THAN WHAT IT DOES NOW?
             CanvasTool.FILL -> fillScope?.launch { _actions.value += fillSegment(to, color.value) }
             CanvasTool.EYEDROPPER -> fillScope?.launch { setColorFromPixel(to) }
         }
+    }
+
+    private fun drawSpraySegment(points: List<Offset>): DrawAction.Spray {
+        val radius = strokeWidth.value
+        val density = (radius * 2).toInt()
+        val sprayPoints = mutableListOf<Offset>()
+
+        points.forEach { (x, y) ->
+            repeat(density) {
+                val angle = (0..360).random().toDouble() * (PI / 180)
+                val distance = (0..100).random().toFloat() / 100f * radius
+
+                val dX = x + (cos(angle) * distance).toFloat()
+                val dY = y + (sin(angle) * distance).toFloat()
+
+                sprayPoints.add(Offset(dX, dY))
+            }
+        }
+
+        val action = DrawAction.Spray(
+            points = sprayPoints,
+            paintOptions = PaintOptions(
+                color.value,
+                1f,
+                opacity.value,
+                canvasTool.value
+            )
+        )
+
+        return action
     }
 
     private suspend fun fillSegment(startOffset: Offset, targetColor: Color): DrawAction.Fill {
@@ -376,6 +434,11 @@ private sealed interface DrawAction {
     data class Fill(
         override val points: List<Offset>,
         val color: Color
+    ) : DrawAction
+
+    data class Spray(
+        override val points: List<Offset>,
+        val paintOptions: PaintOptions
     ) : DrawAction
 }
 

@@ -4,5 +4,6 @@ enum class CanvasTool {
     BRUSH,
     ERASER,
     FILL,
-    EYEDROPPER;
+    EYEDROPPER,
+    SPRAY_CAN;
 }
