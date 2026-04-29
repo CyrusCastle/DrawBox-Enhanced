@@ -33,7 +33,7 @@ Building on the work of Mark Yavorskyi's [DrawBox](https://github.com/MarkYav/Dr
 
 Using Gradle Kotlin DSL:
 ```kotlin
-implementation("uk.codecymru.drawbox:drawbox:1.9.9")
+implementation("uk.codecymru.drawbox:drawbox:2.0.0")
 ```
 
 ## Usage
