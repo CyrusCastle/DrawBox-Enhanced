@@ -4,7 +4,7 @@ object Library {
     const val URL = "https://github.com/CyrusCastle/DrawBox-Enhanced"
 
     const val GROUP = "uk.codecymru.drawbox"
-    const val VERSION = "1.9.9"
+    const val VERSION = "2.0.0"
 
     object License {
         const val NAME = "Apache-2.0"

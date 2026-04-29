@@ -75,3 +75,8 @@ android {
 signing {
     isRequired = !project.hasProperty("signing.skip")
 }
+
+tasks.withType<AbstractPublishToMaven>().configureEach {
+    val signingTasks = tasks.withType<Sign>()
+    mustRunAfter(signingTasks)
+}

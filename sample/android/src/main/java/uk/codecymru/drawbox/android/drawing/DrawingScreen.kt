@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -26,7 +27,8 @@ import kotlinx.coroutines.flow.collectLatest
 fun DrawingScreen(
     bitmapCallback: (ImageBitmap) -> Unit,
 ) {
-    val drawController = remember { BitmapDrawController() }
+    val fillScope = rememberCoroutineScope()
+    val drawController = remember { BitmapDrawController(fillScope) }
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicturePreview()
     ) { bitmap ->

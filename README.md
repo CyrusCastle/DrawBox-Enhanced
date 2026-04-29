@@ -9,15 +9,20 @@
 Building on the work of Mark Yavorskyi's [DrawBox](https://github.com/MarkYav/DrawBox), DrawBox Enhanced is a Compose Multiplatform library to quickly and easily provide a canvas for your users to draw on.
 
 ## Features
-- Compose Multiplatform, targeting: JVM, Android, WASM
+- Compose Multiplatform, targeting: JVM, Android, WASM, iOS
 - Customisable background, stroke size, colours and opacities
 - Eraser tool
+- Fill tool
+- Eyedropper tool
+- Spray can tool
+- Shape tools (line, rectangle, oval)
 - Undo, redo, or clear all brushstrokes
 - An easy implementation
 
 **Planned features:**
-- Import/export bitmaps
-- Fill tool and perhaps shapes
+- Maybe a select/translate tool
+- Maybe a text tool
+- Layers
 
 [//]: # (## Demo)
 
@@ -28,7 +33,7 @@ Building on the work of Mark Yavorskyi's [DrawBox](https://github.com/MarkYav/Dr
 
 Using Gradle Kotlin DSL:
 ```kotlin
-implementation("uk.codecymru.drawbox:drawbox:1.9.9")
+implementation("uk.codecymru.drawbox:drawbox:2.0.0")
 ```
 
 ## Usage
@@ -36,6 +41,13 @@ implementation("uk.codecymru.drawbox:drawbox:1.9.9")
 ```kotlin
 val controller = remember { BitmapDrawController() }
 DrawBox(drawController = controller, modifier = Modifier.fillMaxSize())
+```
+
+**Enabling fill/eyedropper**
+```kotlin
+// To use the fill/eyedropper tools, the DrawController will need to be fed a coroutine scope
+val fillScope = rememberCoroutineScope()
+val controller = remember { BitmapDrawController(fillScope) }
 ```
 
 **Enabling undo/redo**
@@ -64,6 +76,13 @@ TextButton(onClick = { controller.canvasTool.value = CanvasTool.BRUSH }) {
 TextButton(onClick = { controller.canvasTool.value = CanvasTool.ERASER }) {
     Text("Eraser")
 }
+// etc...
+```
+
+**Importing a bitmap**
+```kotlin
+val bitmap: ImageBitmap = (...)
+drawController.open(bitmap)
 ```
 
 ## Examples
