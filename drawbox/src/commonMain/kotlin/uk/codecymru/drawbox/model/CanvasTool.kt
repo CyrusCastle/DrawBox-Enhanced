@@ -2,5 +2,6 @@ package uk.codecymru.drawbox.model
 
 enum class CanvasTool {
     BRUSH,
-    ERASER;
+    ERASER,
+    FILL;
 }

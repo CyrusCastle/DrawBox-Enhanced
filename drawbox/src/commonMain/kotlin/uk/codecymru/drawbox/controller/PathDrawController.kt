@@ -105,6 +105,7 @@ class PathDrawController: DrawController {
         when (canvasTool.value){
             CanvasTool.BRUSH -> finalizePath()
             CanvasTool.ERASER -> finalizeEraserPath()
+            CanvasTool.FILL -> TODO()
         }
     }
 
@@ -116,6 +117,7 @@ class PathDrawController: DrawController {
         when (canvasTool.value){
             CanvasTool.BRUSH -> finalizePath()
             CanvasTool.ERASER -> finalizeEraserPath()
+            CanvasTool.FILL -> TODO()
         }
     }
 

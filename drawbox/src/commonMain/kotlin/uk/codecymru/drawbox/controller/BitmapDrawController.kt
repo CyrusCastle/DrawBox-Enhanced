@@ -1,6 +1,5 @@
 package uk.codecymru.drawbox.controller
 
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Canvas
@@ -9,17 +8,22 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageBitmapConfig
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PaintingStyle
+import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import uk.codecymru.drawbox.model.CanvasTool
 import uk.codecymru.drawbox.util.combineStates
 import uk.codecymru.drawbox.util.mapState
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
-class BitmapDrawController: DrawController {
+class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawController {
     //////////////////////
     // CONNECTION STATE //
     //////////////////////
@@ -78,6 +82,7 @@ class BitmapDrawController: DrawController {
             internalBitmap = newBitmap
             internalCanvas = Canvas(newBitmap)
             redrawHistory()
+            deleteCroppedPoints()
         }
     }
 
@@ -90,6 +95,34 @@ class BitmapDrawController: DrawController {
         _actions.value = emptyList()
         _undoneActions.value = emptyList()
         redrawHistory()
+    }
+
+    private fun deleteCroppedPoints() {
+        if (state.value !is DrawBoxConnectionState.Connected) return
+
+        val size = (state.value as DrawBoxConnectionState.Connected).size
+        val maxWidth = size.width.toFloat()
+        val maxHeight = size.height.toFloat()
+
+        _actions.value = _actions.value.map { action ->
+            when (action) {
+                is DrawAction.Path -> {
+                    action.copy(
+                        points = action.points.filter { (from, to) ->
+                            from.x <= maxWidth && from.y <= maxHeight && to.x <= maxWidth && to.y <= maxHeight
+                        }
+                    )
+                }
+
+                is DrawAction.Fill -> {
+                    action.copy(
+                        points = action.points.filter {
+                            it.x <= maxWidth && it.y <= maxHeight
+                        }
+                    )
+                }
+            }
+        }.filter { it.points.isNotEmpty() }
     }
 
     ///////////////////////////
@@ -117,7 +150,7 @@ class BitmapDrawController: DrawController {
         if (!enabled.value) return
 
         if (_currentAction.value.isNotEmpty()) {
-            val action = DrawAction(
+            val action = DrawAction.Path(
                 points = _currentAction.value.toList(),
                 paintOptions = PaintOptions(
                     color.value,
@@ -125,6 +158,9 @@ class BitmapDrawController: DrawController {
                     opacity.value,
                     canvasTool.value
             ))
+
+            applyDrawActionToInternalCanvas(action)
+
             _actions.value += action
         }
         lastPoint = null
@@ -142,69 +178,95 @@ class BitmapDrawController: DrawController {
     // PRIVATE DRAWING METHODS //
     /////////////////////////////
 
+    private fun applyDrawActionToInternalCanvas(action: DrawAction){
+        val canvas = internalCanvas ?: return
+
+        when (action) {
+            is DrawAction.Path -> {
+                val paint = createPaint(
+                    action.paintOptions.color,
+                    action.paintOptions.strokeWidth,
+                    action.paintOptions.opacity,
+                    action.paintOptions.tool
+                )
+                action.points.forEach { (from, to) ->
+                    canvas.drawLine(from, to, paint)
+                }
+            }
+            is DrawAction.Fill -> {
+                canvas.drawPoints(
+                    pointMode = PointMode.Points,
+                    points = action.points,
+                    paint = Paint().apply {
+                        color = action.color
+                        strokeWidth = 1f
+                        blendMode = BlendMode.SrcOver
+                    }
+                )
+            }
+        }
+    }
+
     private fun drawSegment(from: Offset, to: Offset) {
         if (state.value !is DrawBoxConnectionState.Connected) return
 
-        _currentAction.value += from to to
-    }
-
-    private fun createPaint(c: Color, sw: Float, o: Float, tool: CanvasTool): Paint {
-        return Paint().apply {
-            strokeWidth = sw
-            style = PaintingStyle.Stroke
-            strokeCap = StrokeCap.Round
-            strokeJoin = StrokeJoin.Round
-            if (tool == CanvasTool.ERASER) {
-                blendMode = BlendMode.Clear
-            } else {
-                color = c
-                alpha = o
-                blendMode = BlendMode.SrcOver
-            }
+        when (canvasTool.value){
+            CanvasTool.BRUSH, CanvasTool.ERASER -> _currentAction.value += from to to
+            CanvasTool.FILL -> fillScope?.launch { _actions.value += fillSegment(to, color.value) }
         }
     }
 
-    private fun redrawHistory() {
-        if (state.value !is DrawBoxConnectionState.Connected) return
+    private suspend fun fillSegment(startOffset: Offset, targetColor: Color): DrawAction.Fill {
+        val bitmap = getBitmap(null, DrawBoxSubscription.DynamicUpdate).first()
+        val action = fillSegment(bitmap, startOffset, targetColor)
+        applyDrawActionToInternalCanvas(action)
 
-        val canvas = internalCanvas ?: return
-        val bitmap = internalBitmap ?: return
+        return action
+    }
 
-        // Clear the bitmap
-        canvas.drawRect(
-            0f,
-            0f,
-            bitmap.width.toFloat(),
-            bitmap.height.toFloat(),
-            Paint().apply { blendMode = BlendMode.Clear }
-        )
+    private fun fillSegment(bitmap: ImageBitmap, startOffset: Offset, targetColor: Color): DrawAction.Fill {
+        val width = bitmap.width
+        val height = bitmap.height
 
-        // Draw all saved actions
-        _actions.value.forEach { action ->
-            val paint = createPaint(
-                action.paintOptions.color,
-                action.paintOptions.strokeWidth,
-                action.paintOptions.opacity,
-                action.paintOptions.tool
-            )
-            action.points.forEach { (from, to) ->
-                canvas.drawLine(from, to, paint)
+        val x = startOffset.x.toInt().coerceIn(0, width - 1)
+        val y = startOffset.y.toInt().coerceIn(0, height - 1)
+
+        // Create a pixelmap and find our starting colour
+        val pixels = IntArray(width * height)
+        bitmap.readPixels(pixels, startX = 0, startY = 0, width = width, height = height)
+        val startColor = pixels[y * width + x]
+        if (startColor == targetColor.toArgb()) return DrawAction.Fill(emptyList(), targetColor)
+
+        val fillPoints = mutableListOf<Offset>()
+
+        // Breadth-First Search
+        val queue = ArrayDeque<IntOffset>()
+        queue.add(IntOffset(x, y))
+
+        val visited = BooleanArray(width * height)
+
+        while (queue.isNotEmpty()) { // TODO following BFS has quite a lot of boxing
+            val curr = queue.removeFirst()
+            val cx = curr.x
+            val cy = curr.y
+
+            if (cx !in 0 until width || cy !in 0 until height) continue
+            val index = cy * width + cx
+
+            if (!visited[index] && pixels[index] == startColor) {
+                visited[index] = true
+                fillPoints.add(Offset(cx.toFloat(), cy.toFloat()))
+
+                queue.add(IntOffset(cx + 1, cy))
+                queue.add(IntOffset(cx - 1, cy))
+                queue.add(IntOffset(cx, cy + 1))
+                queue.add(IntOffset(cx, cy - 1))
             }
         }
 
-        // Should we remove any points that have been cropped out?
-        val size = (state.value as DrawBoxConnectionState.Connected).size
-        val maxWidth = size.width.toFloat()
-        val maxHeight = size.height.toFloat()
-
-        _actions.value = _actions.value.map { action ->
-            action.copy(
-                points = action.points.filter { (from, to) ->
-                    from.x <= maxWidth && from.y <= maxHeight && to.x <= maxWidth && to.y <= maxHeight
-                }
-            )
-        }.filter { it.points.isNotEmpty() }
+        return DrawAction.Fill(fillPoints, targetColor)
     }
+
 
     /////////////////
     // UNDO & REDO //
@@ -230,6 +292,26 @@ class BitmapDrawController: DrawController {
         }
     }
 
+    private fun redrawHistory(){
+        if (state.value !is DrawBoxConnectionState.Connected) return
+
+        val canvas = internalCanvas ?: return
+        val bitmap = internalBitmap ?: return
+
+        // Clear the bitmap
+        canvas.drawRect(
+            0f,
+            0f,
+            bitmap.width.toFloat(),
+            bitmap.height.toFloat(),
+            Paint().apply { blendMode = BlendMode.Clear }
+        )
+
+        _actions.value.forEach { action ->
+            applyDrawActionToInternalCanvas(action)
+        }
+    }
+
     ///////////////////////////
     // SUBSCRIPTION & BITMAP //
     ///////////////////////////
@@ -246,16 +328,8 @@ class BitmapDrawController: DrawController {
             val bitmap = ImageBitmap(canvasSize.width, canvasSize.height, ImageBitmapConfig.Argb8888)
             val canvas = Canvas(bitmap)
 
-            actions.forEach { action ->
-                val paint = createPaint(
-                    action.paintOptions.color,
-                    action.paintOptions.strokeWidth,
-                    action.paintOptions.opacity,
-                    action.paintOptions.tool
-                )
-                action.points.forEach { (from, to) ->
-                    canvas.drawLine(from, to, paint)
-                }
+            internalBitmap?.let {
+                canvas.drawImage(it, Offset.Zero, Paint())
             }
 
             if (subscription is DrawBoxSubscription.DynamicUpdate){
@@ -276,11 +350,20 @@ class BitmapDrawController: DrawController {
     }
 }
 
-// TODO are these two classes necessary? If no, remove. If yes, then why are they used in such a limited capacity
-private data class DrawAction(
-    val points: List<Pair<Offset, Offset>>,
-    val paintOptions: PaintOptions
-)
+// TODO once we're happy with this implementation, move these somewhere
+private sealed interface DrawAction {
+    val points: List<Any>
+
+    data class Path(
+        override val points: List<Pair<Offset, Offset>>, // TODO would it be better to switch to a path for this?
+        val paintOptions: PaintOptions
+    ) : DrawAction
+
+    data class Fill(
+        override val points: List<Offset>,
+        val color: Color
+    ) : DrawAction
+}
 
 private data class PaintOptions(
     val color: Color,
@@ -288,3 +371,19 @@ private data class PaintOptions(
     val opacity: Float,
     val tool: CanvasTool
 )
+
+private fun createPaint(c: Color, sw: Float, o: Float, tool: CanvasTool): Paint {
+    return Paint().apply {
+        strokeWidth = sw
+        style = PaintingStyle.Stroke
+        strokeCap = StrokeCap.Round
+        strokeJoin = StrokeJoin.Round
+        if (tool == CanvasTool.ERASER) {
+            blendMode = BlendMode.Clear
+        } else {
+            color = c
+            alpha = o
+            blendMode = BlendMode.SrcOver
+        }
+    }
+}
