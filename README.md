@@ -22,6 +22,7 @@ Building on the work of Mark Yavorskyi's [DrawBox](https://github.com/MarkYav/Dr
 **Planned features:**
 - Import/export bitmaps
 - Maybe a select/translate tool
+- Maybe a text tool
 
 [//]: # (## Demo)
 
