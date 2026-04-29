@@ -213,6 +213,7 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
         when (canvasTool.value){
             CanvasTool.BRUSH, CanvasTool.ERASER -> _currentAction.value += from to to
             CanvasTool.FILL -> fillScope?.launch { _actions.value += fillSegment(to, color.value) }
+            CanvasTool.EYEDROPPER -> fillScope?.launch { setColorFromPixel(to) }
         }
     }
 
@@ -224,17 +225,20 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
         return action
     }
 
+    private fun getPixelArray(bitmap: ImageBitmap): IntArray{
+        val pixels = IntArray(bitmap.width * bitmap.height)
+        bitmap.readPixels(pixels, startX = 0, startY = 0, width = bitmap.width, height = bitmap.height)
+
+        return pixels
+    }
+
     private fun fillSegment(bitmap: ImageBitmap, startOffset: Offset, targetColor: Color): DrawAction.Fill {
-        val width = bitmap.width
-        val height = bitmap.height
+        val x = startOffset.x.toInt().coerceIn(0, bitmap.width - 1)
+        val y = startOffset.y.toInt().coerceIn(0, bitmap.height - 1)
 
-        val x = startOffset.x.toInt().coerceIn(0, width - 1)
-        val y = startOffset.y.toInt().coerceIn(0, height - 1)
+        val pixels = getPixelArray(bitmap)
 
-        // Create a pixelmap and find our starting colour
-        val pixels = IntArray(width * height)
-        bitmap.readPixels(pixels, startX = 0, startY = 0, width = width, height = height)
-        val startColor = pixels[y * width + x]
+        val startColor = pixels[y * bitmap.width + x]
         if (startColor == targetColor.toArgb()) return DrawAction.Fill(emptyList(), targetColor)
 
         val fillPoints = mutableListOf<Offset>()
@@ -243,15 +247,15 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
         val queue = ArrayDeque<IntOffset>()
         queue.add(IntOffset(x, y))
 
-        val visited = BooleanArray(width * height)
+        val visited = BooleanArray(bitmap.width * bitmap.height)
 
         while (queue.isNotEmpty()) { // TODO following BFS has quite a lot of boxing
             val curr = queue.removeFirst()
             val cx = curr.x
             val cy = curr.y
 
-            if (cx !in 0 until width || cy !in 0 until height) continue
-            val index = cy * width + cx
+            if (cx !in 0 until bitmap.width || cy !in 0 until bitmap.height) continue
+            val index = cy * bitmap.width + cx
 
             if (!visited[index] && pixels[index] == startColor) {
                 visited[index] = true
@@ -265,6 +269,16 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
         }
 
         return DrawAction.Fill(fillPoints, targetColor)
+    }
+
+    private suspend fun setColorFromPixel(offset: Offset) {
+        val bitmap = getBitmap(null, DrawBoxSubscription.DynamicUpdate).first()
+
+        val x = offset.x.toInt().coerceIn(0, bitmap.width - 1)
+        val y = offset.y.toInt().coerceIn(0, bitmap.height - 1)
+
+        val pixels = getPixelArray(bitmap)
+        color.value = Color(pixels[y * bitmap.width + x])
     }
 
 

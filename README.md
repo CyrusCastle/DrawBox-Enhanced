@@ -13,6 +13,7 @@ Building on the work of Mark Yavorskyi's [DrawBox](https://github.com/MarkYav/Dr
 - Customisable background, stroke size, colours and opacities
 - Eraser tool
 - Fill tool
+- Eyedropper tool
 - Undo, redo, or clear all brushstrokes
 - An easy implementation
 
@@ -40,9 +41,9 @@ val controller = remember { BitmapDrawController() }
 DrawBox(drawController = controller, modifier = Modifier.fillMaxSize())
 ```
 
-**Enabling fill**
+**Enabling fill/eyedropper**
 ```kotlin
-// To use the fill tool, the DrawController will need to be fed a coroutine scope
+// To use the fill/eyedropper tools, the DrawController will need to be fed a coroutine scope
 val fillScope = rememberCoroutineScope()
 val controller = remember { BitmapDrawController(fillScope) }
 ```
@@ -73,6 +74,7 @@ TextButton(onClick = { controller.canvasTool.value = CanvasTool.BRUSH }) {
 TextButton(onClick = { controller.canvasTool.value = CanvasTool.ERASER }) {
     Text("Eraser")
 }
+// etc...
 ```
 
 ## Examples
