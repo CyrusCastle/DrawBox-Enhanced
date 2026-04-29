@@ -19,6 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -32,7 +33,8 @@ import uk.codecymru.drawbox.model.CanvasTool
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
-        val controller = remember { BitmapDrawController() }
+        val fillScope = rememberCoroutineScope()
+        val controller = remember { BitmapDrawController(fillScope) }
         val bitmap by controller.getBitmap(null, DrawBoxSubscription.DynamicUpdate).collectAsState()
         val bitmapFinishDrawingUpdate by controller.getBitmap(null, DrawBoxSubscription.FinishDrawingUpdate).collectAsState()
 
@@ -71,6 +73,9 @@ fun main() = application {
                             }
                             TextButton(onClick = { controller.canvasTool.value = CanvasTool.ERASER }) {
                                 Text("Eraser")
+                            }
+                            TextButton(onClick = { controller.canvasTool.value = CanvasTool.FILL }) {
+                                Text("Fill")
                             }
                         }
                     }

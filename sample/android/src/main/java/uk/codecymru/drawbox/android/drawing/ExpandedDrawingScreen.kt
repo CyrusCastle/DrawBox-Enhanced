@@ -62,6 +62,9 @@ internal fun ExpandedDrawingScreen(
                 TextButton(onClick = { drawController.canvasTool.value = CanvasTool.ERASER }) {
                     Text("Eraser")
                 }
+                TextButton(onClick = { drawController.canvasTool.value = CanvasTool.FILL }) {
+                    Text("Fill")
+                }
             }
         }
     }
