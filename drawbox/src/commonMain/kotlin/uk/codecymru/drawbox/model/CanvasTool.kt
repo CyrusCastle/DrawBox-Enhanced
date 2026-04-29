@@ -5,5 +5,8 @@ enum class CanvasTool {
     ERASER,
     FILL,
     EYEDROPPER,
-    SPRAY_CAN;
+    SPRAY_CAN,
+    SHAPE_LINE,
+    SHAPE_RECT,
+    SHAPE_CIRCLE;
 }

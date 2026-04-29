@@ -132,6 +132,10 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
                         }
                     )
                 }
+
+                is DrawAction.Shape -> {
+                    action // Let us not bother with shape, would be too much work for very little gain
+                }
             }
         }.filter { it.points.isNotEmpty() }
     }
@@ -161,16 +165,27 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
         if (!enabled.value) return
 
         if (_currentAction.value.isNotEmpty()) {
+            val paint = PaintOptions(
+                color.value,
+                strokeWidth.value,
+                opacity.value,
+                canvasTool.value
+            )
+
             val action = when (canvasTool.value){
                 CanvasTool.BRUSH, CanvasTool.ERASER -> DrawAction.Path(
                     points = _currentAction.value.toList(),
-                    paintOptions = PaintOptions(
-                        color.value,
-                        strokeWidth.value,
-                        opacity.value,
-                        canvasTool.value
-                ))
+                    paintOptions = paint
+                )
                 CanvasTool.SPRAY_CAN -> drawSpraySegment(_currentAction.value.toList().map { it.first })
+                CanvasTool.SHAPE_LINE, CanvasTool.SHAPE_RECT, CanvasTool.SHAPE_CIRCLE -> {
+                    DrawAction.Shape(
+                        start = _currentAction.value.first().first,
+                        end = _currentAction.value.first().second,
+                        shapeType = canvasTool.value,
+                        paintOptions = paint
+                    )
+                }
                 else -> DrawAction.Fill(points = emptyList(), color = Color.Black) // TODO not the best way of doing this
             }
 
@@ -184,8 +199,13 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
     override fun onTap(offset: Offset) {
         if (!enabled.value) return
 
-        drawSegment(offset, offset)
-        onDragEnd()
+        when (canvasTool.value){
+            CanvasTool.SHAPE_LINE, CanvasTool.SHAPE_RECT, CanvasTool.SHAPE_CIRCLE -> return
+            else -> {
+                drawSegment(offset, offset)
+                onDragEnd()
+            }
+        }
     }
 
     /////////////////////////////
@@ -232,16 +252,55 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
                     paint = paint
                 )
             }
+            is DrawAction.Shape -> {
+                val paint = createPaint(
+                    action.paintOptions.color,
+                    action.paintOptions.strokeWidth,
+                    action.paintOptions.opacity,
+                    action.paintOptions.tool
+                )
+
+                when (action.shapeType){
+                    CanvasTool.SHAPE_LINE -> {
+                        canvas.drawLine(action.start, action.end, paint)
+                    }
+
+                    CanvasTool.SHAPE_RECT -> {
+                        canvas.drawRect(
+                            left = minOf(action.start.x, action.end.x),
+                            top = minOf(action.start.y, action.end.y),
+                            right = maxOf(action.start.x, action.end.x),
+                            bottom = maxOf(action.start.y, action.end.y),
+                            paint = paint
+                        )
+                    }
+
+                    CanvasTool.SHAPE_CIRCLE -> {
+                        canvas.drawOval(
+                            left = minOf(action.start.x, action.end.x),
+                            top = minOf(action.start.y, action.end.y),
+                            right = maxOf(action.start.x, action.end.x),
+                            bottom = maxOf(action.start.y, action.end.y),
+                            paint = paint
+                        )
+                    }
+
+                    else -> {}
+                }
+            }
         }
     }
 
     private fun drawSegment(from: Offset, to: Offset) {
         if (state.value !is DrawBoxConnectionState.Connected) return
 
+        val start = if (_currentAction.value.isEmpty()) lastPoint ?: from else _currentAction.value.first().first
+
         when (canvasTool.value){
             CanvasTool.BRUSH, CanvasTool.ERASER, CanvasTool.SPRAY_CAN -> _currentAction.value += from to to // TODO WOULD THIS BE BETTER IF currentAction TOOK A REAL ACTION RATHER THAN WHAT IT DOES NOW?
             CanvasTool.FILL -> fillScope?.launch { _actions.value += fillSegment(to, color.value) }
             CanvasTool.EYEDROPPER -> fillScope?.launch { setColorFromPixel(to) }
+            CanvasTool.SHAPE_LINE, CanvasTool.SHAPE_RECT, CanvasTool.SHAPE_CIRCLE -> _currentAction.value = listOf(start to to)
         }
     }
 
@@ -412,8 +471,35 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
                     canvasTool.value
                 )
 
-                currentAction.forEach { (from, to) ->
-                    canvas.drawLine(from, to, paint)
+                when (canvasTool.value){
+                    CanvasTool.SHAPE_RECT -> {
+                        currentAction.forEach { (from, to) ->
+                            canvas.drawRect(
+                                minOf(from.x, to.x),
+                                minOf(from.y, to.y),
+                                maxOf(from.x, to.x),
+                                maxOf(from.y, to.y),
+                                paint
+                            )
+                        }
+                    }
+                    CanvasTool.SHAPE_CIRCLE -> {
+                        currentAction.forEach { (from, to) ->
+                            canvas.drawOval(
+                                minOf(from.x, to.x),
+                                minOf(from.y, to.y),
+                                maxOf(from.x, to.x),
+                                maxOf(from.y, to.y),
+                                paint
+                            )
+                        }
+                    }
+
+                    else -> {
+                        currentAction.forEach { (from, to) ->
+                            canvas.drawLine(from, to, paint)
+                        }
+                    }
                 }
             }
 
@@ -440,6 +526,15 @@ private sealed interface DrawAction {
         override val points: List<Offset>,
         val paintOptions: PaintOptions
     ) : DrawAction
+
+    data class Shape(
+        val start: Offset,
+        val end: Offset,
+        val shapeType: CanvasTool,
+        val paintOptions: PaintOptions
+    ) : DrawAction {
+        override val points: List<Offset> = listOf(start, end)
+    }
 }
 
 private data class PaintOptions(

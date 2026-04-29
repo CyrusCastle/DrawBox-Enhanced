@@ -15,12 +15,12 @@ Building on the work of Mark Yavorskyi's [DrawBox](https://github.com/MarkYav/Dr
 - Fill tool
 - Eyedropper tool
 - Spray can tool
+- Shape tools (line, rectangle, oval)
 - Undo, redo, or clear all brushstrokes
 - An easy implementation
 
 **Planned features:**
 - Import/export bitmaps
-- Maybe a shape tool
 - Maybe a select/translate tool
 
 [//]: # (## Demo)
