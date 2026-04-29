@@ -92,6 +92,15 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
     override fun open(image: ImageBitmap) {
         reset()
         openedImage.value = image
+
+        val canvas = internalCanvas ?: return
+        val size = (state.value as? DrawBoxConnectionState.Connected)?.size ?: IntSize(1, 1)
+        canvas.drawImageRect(
+            image = image,
+            srcOffset = IntOffset.Zero,
+            dstSize = size,
+            paint = Paint()
+        )
     }
 
     override fun reset() { // TODO or could reset be an action of its own, to be undone and redone??

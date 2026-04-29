@@ -20,7 +20,6 @@ Building on the work of Mark Yavorskyi's [DrawBox](https://github.com/MarkYav/Dr
 - An easy implementation
 
 **Planned features:**
-- Import/export bitmaps
 - Maybe a select/translate tool
 - Maybe a text tool
 - Layers
@@ -78,6 +77,12 @@ TextButton(onClick = { controller.canvasTool.value = CanvasTool.ERASER }) {
     Text("Eraser")
 }
 // etc...
+```
+
+**Importing a bitmap**
+```kotlin
+val bitmap: ImageBitmap = (...)
+drawController.open(bitmap)
 ```
 
 ## Examples
