@@ -9,7 +9,7 @@
 Building on the work of Mark Yavorskyi's [DrawBox](https://github.com/MarkYav/DrawBox), DrawBox Enhanced is a Compose Multiplatform library to quickly and easily provide a canvas for your users to draw on.
 
 ## Features
-- Compose Multiplatform, targeting: JVM, Android, WASM
+- Compose Multiplatform, targeting: JVM, Android, WASM, iOS
 - Customisable background, stroke size, colours and opacities
 - Eraser tool
 - Fill tool
