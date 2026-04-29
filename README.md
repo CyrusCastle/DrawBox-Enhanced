@@ -12,12 +12,14 @@ Building on the work of Mark Yavorskyi's [DrawBox](https://github.com/MarkYav/Dr
 - Compose Multiplatform, targeting: JVM, Android, WASM
 - Customisable background, stroke size, colours and opacities
 - Eraser tool
+- Fill tool
 - Undo, redo, or clear all brushstrokes
 - An easy implementation
 
 **Planned features:**
 - Import/export bitmaps
-- Fill tool and perhaps shapes
+- Maybe a shape tool
+- Maybe a select/translate tool
 
 [//]: # (## Demo)
 
@@ -36,6 +38,13 @@ implementation("uk.codecymru.drawbox:drawbox:1.9.9")
 ```kotlin
 val controller = remember { BitmapDrawController() }
 DrawBox(drawController = controller, modifier = Modifier.fillMaxSize())
+```
+
+**Enabling fill**
+```kotlin
+// To use the fill tool, the DrawController will need to be fed a coroutine scope
+val fillScope = rememberCoroutineScope()
+val controller = remember { BitmapDrawController(fillScope) }
 ```
 
 **Enabling undo/redo**
