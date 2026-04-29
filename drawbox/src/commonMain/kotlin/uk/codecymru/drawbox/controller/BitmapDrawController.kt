@@ -235,6 +235,7 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
                         color = action.color
                         strokeWidth = 1f
                         blendMode = BlendMode.SrcOver
+                        isAntiAlias = false
                     }
                 )
             }
