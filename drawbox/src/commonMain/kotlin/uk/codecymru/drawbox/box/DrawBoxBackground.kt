@@ -3,6 +3,7 @@ package uk.codecymru.drawbox.box
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -15,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import uk.codecymru.drawbox.controller.DrawBoxBackground
 
 @Composable
-fun DrawBoxBackground(
+fun BoxScope.DrawBoxBackground(
     background: DrawBoxBackground,
     modifier: Modifier,
 ) {
@@ -31,7 +32,7 @@ fun DrawBoxBackground(
             modifier = modifier,
             contentDescription = null
         )
-        is DrawBoxBackground.ComposableBackground -> background.content
+        is DrawBoxBackground.ComposableBackground -> background.content(this)
         is DrawBoxBackground.TransparentBackground -> Box(
             modifier.drawWithCache {
                 val sizePx = 12.dp.toPx()
