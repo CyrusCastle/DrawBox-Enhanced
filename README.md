@@ -129,7 +129,7 @@ DrawBoxViewer(
 ## Examples
 
 Two useful samples of this library's basic usage can be found, written by Mark, in the sample package:
-- [Android](sample/android/src/main/java/io/github/markyav/drawbox/android/MainActivity.kt)
+- [Android](sample/android/src/main/java/uk/codecymru/drawbox/android/MainActivity.kt)
 - [Desktop](sample/desktop/src/jvmMain/kotlin/Main.kt)
 
 For example projects, see the following:
