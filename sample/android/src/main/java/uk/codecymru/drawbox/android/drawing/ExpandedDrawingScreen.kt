@@ -1,7 +1,5 @@
 package uk.codecymru.drawbox.android.drawing
 
-import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
@@ -15,12 +13,10 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import uk.codecymru.drawbox.box.DrawBox
 import uk.codecymru.drawbox.controller.BitmapDrawController
 import uk.codecymru.drawbox.controller.DrawBoxSubscription
-import uk.codecymru.drawbox.controller.DrawController
 import uk.codecymru.drawbox.model.CanvasTool
 
 @Composable
