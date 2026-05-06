@@ -25,11 +25,13 @@ class DrawController(private val fillScope: CoroutineScope? = null) {
     ////////////////
     // MAIN STATE //
     ////////////////
+    /** The bitmap, onto which the user is drawing */
     var internalBitmap: ImageBitmap = ImageBitmap(1, 1)
+
     private var internalCanvas: Canvas = Canvas(internalBitmap)
     private val _actions = MutableStateFlow<List<DrawAction>>(emptyList())
     private val _undoneActions = MutableStateFlow<List<DrawAction>>(emptyList())
-    val _currentAction = MutableStateFlow<DrawnPath>(emptyList())
+    internal val _currentAction = MutableStateFlow<DrawnPath>(emptyList())
     private var lastPoint: Offset? = null
     private var contentBounds: Rect = Rect.Zero
     private var maxBrushSize: Float = 0f
