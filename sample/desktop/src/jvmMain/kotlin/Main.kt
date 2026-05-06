@@ -26,8 +26,8 @@ fun main() = application {
         val fillScope = rememberCoroutineScope()
         val controller = remember { BitmapDrawController(fillScope) }
 
-        val enableUndo by controller.canUndo.collectAsState()
-        val enableRedo by controller.canRedo.collectAsState()
+        val enableUndo by controller.canUndo.collectAsState(false)
+        val enableRedo by controller.canRedo.collectAsState(false)
         val tool by controller.canvasTool.collectAsState()
 
         val strokeWidth by controller.strokeWidth.collectAsState()

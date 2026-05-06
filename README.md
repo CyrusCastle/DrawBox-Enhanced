@@ -52,8 +52,8 @@ val controller = remember { BitmapDrawController(fillScope) }
 
 **Enabling undo/redo**
 ```kotlin
-val enableUndo by controller.canUndo.collectAsState()
-val enableRedo by controller.canRedo.collectAsState()
+val enableUndo by controller.canUndo.collectAsState(false)
+val enableRedo by controller.canRedo.collectAsState(false)
 
 // Then create a button for each:
 IconButton(onClick = controller::undo, enabled = enableUndo) {

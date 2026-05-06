@@ -23,8 +23,8 @@ import uk.codecymru.drawbox.model.CanvasTool
 internal fun ExpandedDrawingScreen(
     drawController: BitmapDrawController,
 ) {
-    val enableUndo by drawController.canUndo.collectAsState()
-    val enableRedo by drawController.canRedo.collectAsState()
+    val enableUndo by drawController.canUndo.collectAsState(false)
+    val enableRedo by drawController.canRedo.collectAsState(false)
 
     Column {
         DrawBox(

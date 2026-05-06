@@ -10,9 +10,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import uk.codecymru.drawbox.model.CanvasTool
-import uk.codecymru.drawbox.util.mapState
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -40,10 +40,10 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null) {
     ///////////////////
 
     /** Can we currently undo? */
-    val canUndo = _actions.mapState { it.isNotEmpty() }
+    val canUndo = _actions.map { it.isNotEmpty() }
 
     /** Can we currently redo? */
-    val canRedo = _undoneActions.mapState { it.isNotEmpty() }
+    val canRedo = _undoneActions.map { it.isNotEmpty() }
 
     ////////////////////
     // BRUSH SETTINGS //
