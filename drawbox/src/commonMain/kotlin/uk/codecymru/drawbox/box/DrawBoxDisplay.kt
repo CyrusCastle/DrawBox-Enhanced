@@ -13,15 +13,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.text.TextPainter.paint
 import uk.codecymru.drawbox.controller.DrawBoxSubscription
-import uk.codecymru.drawbox.controller.createPaint
 import uk.codecymru.drawbox.model.CanvasTool
+import uk.codecymru.drawbox.model.DrawnPath
+import uk.codecymru.drawbox.model.PaintOptions
 
 @Composable
 internal fun DrawBoxDisplay(
     bitmap: ImageBitmap,
     subscription: DrawBoxSubscription,
-    currentAction: List<Pair<Offset, Offset>>,
+    currentAction: DrawnPath,
     color: Color,
     strokeWidth: Float,
     opacity: Float,
@@ -42,18 +44,18 @@ internal fun DrawBoxDisplay(
 }
 
 private fun Canvas.drawCurrentAction(
-    currentAction: List<Pair<Offset, Offset>>,
+    currentAction: DrawnPath,
     color: Color,
     strokeWidth: Float,
     opacity: Float,
     canvasTool: CanvasTool
 ) {
-    val paint = createPaint(
+    val paint = PaintOptions(
         color,
         strokeWidth,
         opacity,
         canvasTool
-    )
+    ).createPaint()
 
     when (canvasTool) {
         CanvasTool.SHAPE_RECT -> {

@@ -6,13 +6,12 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import uk.codecymru.drawbox.model.CanvasTool
+import uk.codecymru.drawbox.model.DrawAction
+import uk.codecymru.drawbox.model.DrawnPath
+import uk.codecymru.drawbox.model.PaintOptions
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -30,7 +29,7 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null) {
     private var internalCanvas: Canvas = Canvas(internalBitmap)
     private val _actions = MutableStateFlow<List<DrawAction>>(emptyList())
     private val _undoneActions = MutableStateFlow<List<DrawAction>>(emptyList())
-    val _currentAction = MutableStateFlow<List<Pair<Offset, Offset>>>(emptyList())
+    val _currentAction = MutableStateFlow<DrawnPath>(emptyList())
     private var lastPoint: Offset? = null
     private var contentBounds: Rect = Rect.Zero
     private var maxBrushSize: Float = 0f
@@ -193,12 +192,12 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null) {
                 strokeWidth.value,
                 opacity.value,
                 canvasTool.value
-            )
+            ).createPaint()
 
             val action = when (canvasTool.value){
                 CanvasTool.BRUSH, CanvasTool.ERASER -> DrawAction.Path(
                     points = _currentAction.value.toList(),
-                    paintOptions = paint
+                    paint = paint
                 )
                 CanvasTool.SPRAY_CAN -> drawSpraySegment(_currentAction.value.toList().map { it.first })
                 CanvasTool.SHAPE_LINE, CanvasTool.SHAPE_RECT, CanvasTool.SHAPE_CIRCLE -> {
@@ -206,7 +205,7 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null) {
                         start = _currentAction.value.first().first,
                         end = _currentAction.value.first().second,
                         shapeType = canvasTool.value,
-                        paintOptions = paint
+                        paint = paint
                     )
                 }
                 else -> DrawAction.Fill(points = emptyList(), color = Color.Black) // TODO not the best way of doing this
@@ -257,14 +256,8 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null) {
 
         when (action) {
             is DrawAction.Path -> {
-                val paint = createPaint(
-                    action.paintOptions.color,
-                    action.paintOptions.strokeWidth,
-                    action.paintOptions.opacity,
-                    action.paintOptions.tool
-                )
                 action.points.forEach { (from, to) ->
-                    this.drawLine(from, to, paint)
+                    this.drawLine(from, to, action.paint)
                 }
 
                 minX = action.points.minOf { (first, second) -> minOf(first.x, second.x) }
@@ -297,17 +290,10 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null) {
                 maxY = action.points.maxOf { (x, y) -> y }
             }
             is DrawAction.Spray -> {
-                val paint = createPaint(
-                    action.paintOptions.color,
-                    action.paintOptions.strokeWidth,
-                    action.paintOptions.opacity,
-                    action.paintOptions.tool
-                )
-
                 this.drawPoints(
                     pointMode = PointMode.Points,
                     points = action.points,
-                    paint = paint
+                    paint = action.paint
                 )
 
                 minX = action.points.minOf { (x, y) -> x }
@@ -317,13 +303,6 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null) {
                 maxY = action.points.maxOf { (x, y) -> y }
             }
             is DrawAction.Shape -> {
-                val paint = createPaint(
-                    action.paintOptions.color,
-                    action.paintOptions.strokeWidth,
-                    action.paintOptions.opacity,
-                    action.paintOptions.tool
-                )
-
                 minX = action.start.x
                 maxX = action.end.x
 
@@ -332,7 +311,7 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null) {
 
                 when (action.shapeType){
                     CanvasTool.SHAPE_LINE -> {
-                        this.drawLine(action.start, action.end, paint)
+                        this.drawLine(action.start, action.end, action.paint)
                     }
 
                     CanvasTool.SHAPE_RECT -> {
@@ -341,7 +320,7 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null) {
                             top = minOf(action.start.y, action.end.y),
                             right = maxOf(action.start.x, action.end.x),
                             bottom = maxOf(action.start.y, action.end.y),
-                            paint = paint
+                            paint = action.paint
                         )
                     }
 
@@ -351,7 +330,7 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null) {
                             top = minOf(action.start.y, action.end.y),
                             right = maxOf(action.start.x, action.end.x),
                             bottom = maxOf(action.start.y, action.end.y),
-                            paint = paint
+                            paint = action.paint
                         )
 
                     }
@@ -398,12 +377,12 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null) {
 
         val action = DrawAction.Spray(
             points = sprayPoints,
-            paintOptions = PaintOptions(
+            paint = PaintOptions(
                 color.value,
                 1f,
                 opacity.value,
                 canvasTool.value
-            )
+            ).createPaint()
         )
 
         return action
@@ -525,57 +504,5 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null) {
 
     private fun triggerRedraw(){
         _trigger.tryEmit(_version++)
-    }
-}
-
-// TODO once we're happy with this implementation, move these somewhere
-private sealed interface DrawAction {
-    val points: List<Any>
-
-    data class Path(
-        override val points: List<Pair<Offset, Offset>>, // TODO would it be better to switch to a path for this?
-        val paintOptions: PaintOptions
-    ) : DrawAction
-
-    data class Fill(
-        override val points: List<Offset>,
-        val color: Color
-    ) : DrawAction
-
-    data class Spray(
-        override val points: List<Offset>,
-        val paintOptions: PaintOptions
-    ) : DrawAction
-
-    data class Shape(
-        val start: Offset,
-        val end: Offset,
-        val shapeType: CanvasTool,
-        val paintOptions: PaintOptions
-    ) : DrawAction {
-        override val points: List<Offset> = listOf(start, end)
-    }
-}
-
-private data class PaintOptions(
-    val color: Color,
-    val strokeWidth: Float,
-    val opacity: Float,
-    val tool: CanvasTool
-)
-
-fun createPaint(c: Color, sw: Float, o: Float, tool: CanvasTool): Paint {
-    return Paint().apply {
-        strokeWidth = sw
-        style = PaintingStyle.Stroke
-        strokeCap = StrokeCap.Round
-        strokeJoin = StrokeJoin.Round
-        if (tool == CanvasTool.ERASER) {
-            blendMode = BlendMode.Clear
-        } else {
-            color = c
-            alpha = o
-            blendMode = BlendMode.SrcOver
-        }
     }
 }

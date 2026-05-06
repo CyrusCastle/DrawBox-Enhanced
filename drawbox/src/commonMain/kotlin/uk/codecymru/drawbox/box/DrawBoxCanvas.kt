@@ -16,6 +16,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import uk.codecymru.drawbox.controller.DrawBoxSubscription
 import uk.codecymru.drawbox.model.CanvasTool
+import uk.codecymru.drawbox.model.DrawnPath
 
 @Composable
 internal fun DrawBoxCanvas(
@@ -23,7 +24,7 @@ internal fun DrawBoxCanvas(
     version: Int,
     subscription: DrawBoxSubscription,
     enableInteraction: Boolean,
-    currentAction: List<Pair<Offset, Offset>>,
+    currentAction: DrawnPath,
     color: Color,
     strokeWidth: Float,
     opacity: Float,
