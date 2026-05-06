@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import uk.codecymru.drawbox.model.CanvasTool
 import uk.codecymru.drawbox.util.mapState
@@ -16,7 +17,7 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawController {
+class BitmapDrawController(private val fillScope: CoroutineScope? = null) {
     //////////////////////
     // CONNECTION STATE //
     //////////////////////
@@ -26,7 +27,7 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
     // MAIN STATE //
     ////////////////
     var internalBitmap: ImageBitmap = ImageBitmap(1, 1)
-    private var internalCanvas: Canvas? = null
+    private var internalCanvas: Canvas = Canvas(internalBitmap)
     private val _actions = MutableStateFlow<List<DrawAction>>(emptyList())
     private val _undoneActions = MutableStateFlow<List<DrawAction>>(emptyList())
     val _currentAction = MutableStateFlow<List<Pair<Offset, Offset>>>(emptyList())
@@ -38,28 +39,47 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
     // DERIVED STATE //
     ///////////////////
 
-    override val canUndo = _actions.mapState { it.isNotEmpty() }
-    override val canRedo = _undoneActions.mapState { it.isNotEmpty() }
+    /** Can we currently undo? */
+    val canUndo = _actions.mapState { it.isNotEmpty() }
+
+    /** Can we currently redo? */
+    val canRedo = _undoneActions.mapState { it.isNotEmpty() }
 
     ////////////////////
     // BRUSH SETTINGS //
     ////////////////////
-    override var canvasTool: MutableStateFlow<CanvasTool> = MutableStateFlow(CanvasTool.BRUSH)
-    override var opacity: MutableStateFlow<Float> = MutableStateFlow(1f)
-    override var strokeWidth: MutableStateFlow<Float> = MutableStateFlow(10f)
-    override var color: MutableStateFlow<Color> = MutableStateFlow(Color.Red)
+
+    /** What tool is currently being used (Brush, Eraser, etc.) */
+    var canvasTool: MutableStateFlow<CanvasTool> = MutableStateFlow(CanvasTool.BRUSH)
+
+    /** The current stroke width */
+    var opacity: MutableStateFlow<Float> = MutableStateFlow(1f)
+
+    /** The current stroke color */
+    var strokeWidth: MutableStateFlow<Float> = MutableStateFlow(10f)
+
+    /** The current stroke opacity */
+    var color: MutableStateFlow<Color> = MutableStateFlow(Color.Red)
 
     ////////////////////
     // OTHER SETTINGS //
     ////////////////////
-    override var enabled: MutableStateFlow<Boolean> = MutableStateFlow(true)
-    override var canvasOpacity: MutableStateFlow<Float> = MutableStateFlow(1f)
+    /** Can we currently interact with this controller? */
+    var enabled: MutableStateFlow<Boolean> = MutableStateFlow(true)
+
+    /** The opacity of the canvas background */
+    var canvasOpacity: MutableStateFlow<Float> = MutableStateFlow(1f)
 
     /////////////////////////
     // BACKGROUND SETTINGS //
     /////////////////////////
-    override val openedImage: MutableStateFlow<ImageBitmap?> = MutableStateFlow(null)
-    override var background: MutableStateFlow<DrawBoxBackground> = MutableStateFlow(DrawBoxBackground.NoBackground)
+    private val _openedImage: MutableStateFlow<ImageBitmap?> = MutableStateFlow(null)
+
+    /** An image, if there is one, which has been loaded onto the canvas (this goes IN-FRONT of any previous drawings) */
+    val openedImage = _openedImage.asStateFlow()
+
+    /** A background, perhaps, that goes BEHIND the canvas */
+    val background: MutableStateFlow<DrawBoxBackground> = MutableStateFlow(DrawBoxBackground.NoBackground)
 
     // *********** //
     // * METHODS * //
@@ -69,7 +89,8 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
     // INIT & RESET //
     ///////////////////
 
-    override fun connectToDrawBox(size: IntSize) {
+    /** Initialise or update the controller with the canvas size */
+    fun connectToDrawBox(size: IntSize) {
         if (size.width > 0 && size.height > 0) {
             state.value = DrawBoxConnectionState.Connected(size = size)
 
@@ -81,13 +102,13 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
         }
     }
 
-    override fun open(image: ImageBitmap) {
+    /** Open a new image as a backing for the canvas */
+    fun open(image: ImageBitmap) {
         reset()
-        openedImage.value = image
+        _openedImage.value = image
 
-        val canvas = internalCanvas ?: return
         val size = (state.value as? DrawBoxConnectionState.Connected)?.size ?: IntSize(1, 1)
-        canvas.drawImageRect(
+        internalCanvas.drawImageRect( // TODO does undoing clear this opened image? Worth checking. Could add it as an action or something.
             image = image,
             srcOffset = IntOffset.Zero,
             dstSize = size,
@@ -95,7 +116,8 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
         )
     }
 
-    override fun reset() { // TODO or could reset be an action of its own, to be undone and redone??
+    /** Clear the canvas and history */
+    fun reset() { // TODO or could reset be an action of its own, to be undone and redone??
         _actions.value = emptyList()
         _undoneActions.value = emptyList()
         redrawHistory()
@@ -145,7 +167,7 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
     // HANDLING INTERACTIONS //
     ///////////////////////////
 
-    override fun onDragStart(offset: Offset) {
+    internal fun onDragStart(offset: Offset) {
         if (!enabled.value) return
 
         lastPoint = offset
@@ -154,7 +176,7 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
         drawSegment(offset, offset)
     }
 
-    override fun onDrag(offset: Offset) {
+    internal fun onDrag(offset: Offset) {
         if (!enabled.value) return
 
         val start = lastPoint ?: offset
@@ -162,7 +184,7 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
         lastPoint = offset
     }
 
-    override fun onDragEnd() {
+    internal fun onDragEnd() {
         if (!enabled.value) return
 
         if (_currentAction.value.isNotEmpty()) {
@@ -197,7 +219,7 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
         _currentAction.value = emptyList()
     }
 
-    override fun onTap(offset: Offset) {
+    internal fun onTap(offset: Offset) {
         if (!enabled.value) return
 
         when (canvasTool.value){
@@ -223,8 +245,7 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
     }
 
     private fun applyDrawActionToInternalCanvas(action: DrawAction){
-        val canvas = internalCanvas ?: return
-        canvas.applyDrawAction(action)
+        internalCanvas.applyDrawAction(action)
         triggerRedraw()
     }
 
@@ -388,6 +409,7 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
         return action
     }
 
+    // TODO this no longer needs to be suspend:
     private suspend fun fillSegment(startOffset: Offset, targetColor: Color): DrawAction.Fill {
         val action = fillSegment(internalBitmap, startOffset, targetColor)
         applyDrawActionToInternalCanvas(action)
@@ -441,6 +463,7 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
         return DrawAction.Fill(fillPoints, targetColor)
     }
 
+    // TODO this doesn't need to be suspend anymore:
     private suspend fun setColorFromPixel(offset: Offset) {
         val x = offset.x.toInt().coerceIn(0, internalBitmap.width - 1)
         val y = offset.y.toInt().coerceIn(0, internalBitmap.height - 1)
@@ -454,7 +477,8 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
     // UNDO & REDO //
     /////////////////
 
-    override fun undo() {
+    /** Undo the last action */
+    fun undo() {
         if (_actions.value.isNotEmpty()) {
             val undone = _actions.value[_actions.value.lastIndex]
 
@@ -464,7 +488,8 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
         }
     }
 
-    override fun redo() {
+    /** Redo the last undone action */
+    fun redo() {
         if (_undoneActions.value.isNotEmpty()) {
             val undone = _undoneActions.value[_undoneActions.value.lastIndex]
 
@@ -477,15 +502,12 @@ class BitmapDrawController(private val fillScope: CoroutineScope? = null): DrawC
     private fun redrawHistory(){
         if (state.value !is DrawBoxConnectionState.Connected) return
 
-        val canvas = internalCanvas ?: return
-        val bitmap = internalBitmap ?: return
-
         // Clear the bitmap
-        canvas.drawRect(
+        internalCanvas.drawRect(
             0f,
             0f,
-            bitmap.width.toFloat(),
-            bitmap.height.toFloat(),
+            internalBitmap.width.toFloat(),
+            internalBitmap.height.toFloat(),
             Paint().apply { blendMode = BlendMode.Clear }
         )
 
