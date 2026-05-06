@@ -24,9 +24,7 @@ import kotlinx.coroutines.flow.collectLatest
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun DrawingScreen(
-    bitmapCallback: (ImageBitmap) -> Unit,
-) {
+fun DrawingScreen() {
     val fillScope = rememberCoroutineScope()
     val drawController = remember { DrawController(fillScope) }
     val takePictureLauncher = rememberLauncherForActivityResult(
@@ -41,11 +39,6 @@ fun DrawingScreen(
         drawController.color.value = Color.Blue
         drawController.background.value = DrawBoxBackground.ColourBackground(color = Color.Red, alpha = 0.15f)
         drawController.canvasOpacity.value = 0.5f
-        drawController.getBitmap(500, DrawBoxSubscription.FinishDrawingUpdate)
-            .collectLatest {
-                Log.i("TAG_aaa", "DrawingScreen: emitted!")
-                bitmapCallback(it)
-            }
     }
 
     Column {
