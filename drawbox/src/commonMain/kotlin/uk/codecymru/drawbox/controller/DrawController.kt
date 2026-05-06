@@ -51,25 +51,25 @@ class DrawController(private val fillScope: CoroutineScope? = null) {
     ////////////////////
 
     /** What tool is currently being used (Brush, Eraser, etc.) */
-    var canvasTool: MutableStateFlow<CanvasTool> = MutableStateFlow(CanvasTool.BRUSH)
+    val canvasTool: MutableStateFlow<CanvasTool> = MutableStateFlow(CanvasTool.BRUSH)
 
     /** The current stroke width */
-    var opacity: MutableStateFlow<Float> = MutableStateFlow(1f)
+    val opacity: MutableStateFlow<Float> = MutableStateFlow(1f)
 
     /** The current stroke color */
-    var strokeWidth: MutableStateFlow<Float> = MutableStateFlow(10f)
+    val strokeWidth: MutableStateFlow<Float> = MutableStateFlow(10f)
 
     /** The current stroke opacity */
-    var color: MutableStateFlow<Color> = MutableStateFlow(Color.Red)
+    val color: MutableStateFlow<Color> = MutableStateFlow(Color.Red)
 
     ////////////////////
     // OTHER SETTINGS //
     ////////////////////
     /** Can we currently interact with this controller? */
-    var enabled: MutableStateFlow<Boolean> = MutableStateFlow(true)
+    val enabled: MutableStateFlow<Boolean> = MutableStateFlow(true)
 
     /** The opacity of the canvas background */
-    var canvasOpacity: MutableStateFlow<Float> = MutableStateFlow(1f)
+    val canvasOpacity: MutableStateFlow<Float> = MutableStateFlow(1f)
 
     /////////////////////////
     // BACKGROUND SETTINGS //
