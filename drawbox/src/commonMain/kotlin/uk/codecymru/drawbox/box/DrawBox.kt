@@ -5,12 +5,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
-import uk.codecymru.drawbox.controller.BitmapDrawController
+import uk.codecymru.drawbox.controller.DrawController
 import uk.codecymru.drawbox.controller.DrawBoxSubscription
 
 @Composable
 fun DrawBox(
-    controller: BitmapDrawController,
+    controller: DrawController,
     enableInteraction: Boolean = true,
     subscription: DrawBoxSubscription = DrawBoxSubscription.DynamicUpdate,
     modifier: Modifier = Modifier,
@@ -63,7 +63,7 @@ fun DrawBox(
 
 @Composable
 fun DrawBoxViewer(
-    controller: BitmapDrawController,
+    controller: DrawController,
     subscription: DrawBoxSubscription = DrawBoxSubscription.DynamicUpdate,
     modifier: Modifier = Modifier
 ) = DrawBox(controller, false, subscription, modifier)

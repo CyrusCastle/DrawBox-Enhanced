@@ -15,7 +15,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import uk.codecymru.drawbox.box.DrawBox
 import uk.codecymru.drawbox.box.DrawBoxViewer
-import uk.codecymru.drawbox.controller.BitmapDrawController
+import uk.codecymru.drawbox.controller.DrawController
 import uk.codecymru.drawbox.controller.DrawBoxBackground
 import uk.codecymru.drawbox.controller.DrawBoxSubscription
 import uk.codecymru.drawbox.model.CanvasTool
@@ -25,7 +25,7 @@ import javax.imageio.ImageIO
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
         val fillScope = rememberCoroutineScope()
-        val controller = remember { BitmapDrawController(fillScope) }
+        val controller = remember { DrawController(fillScope) }
 
         val enableUndo by controller.canUndo.collectAsState(false)
         val enableRedo by controller.canRedo.collectAsState(false)

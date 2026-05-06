@@ -16,13 +16,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import uk.codecymru.drawbox.box.DrawBox
 import uk.codecymru.drawbox.box.DrawBoxViewer
-import uk.codecymru.drawbox.controller.BitmapDrawController
+import uk.codecymru.drawbox.controller.DrawController
 import uk.codecymru.drawbox.controller.DrawBoxSubscription
 import uk.codecymru.drawbox.model.CanvasTool
 
 @Composable
 internal fun ExpandedDrawingScreen(
-    drawController: BitmapDrawController,
+    drawController: DrawController,
 ) {
     val enableUndo by drawController.canUndo.collectAsState(false)
     val enableRedo by drawController.canRedo.collectAsState(false)

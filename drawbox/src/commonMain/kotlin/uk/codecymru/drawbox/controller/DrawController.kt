@@ -16,7 +16,7 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-class BitmapDrawController(private val fillScope: CoroutineScope? = null) {
+class DrawController(private val fillScope: CoroutineScope? = null) {
     //////////////////////
     // CONNECTION STATE //
     //////////////////////

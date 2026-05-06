@@ -17,7 +17,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import uk.codecymru.drawbox.controller.BitmapDrawController
+import uk.codecymru.drawbox.controller.DrawController
 import uk.codecymru.drawbox.controller.DrawBoxBackground
 import uk.codecymru.drawbox.controller.DrawBoxSubscription
 import kotlinx.coroutines.flow.collectLatest
@@ -28,7 +28,7 @@ fun DrawingScreen(
     bitmapCallback: (ImageBitmap) -> Unit,
 ) {
     val fillScope = rememberCoroutineScope()
-    val drawController = remember { BitmapDrawController(fillScope) }
+    val drawController = remember { DrawController(fillScope) }
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicturePreview()
     ) { bitmap ->
