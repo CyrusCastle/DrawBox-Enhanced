@@ -18,26 +18,29 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import uk.codecymru.drawbox.box.DrawBox
+import uk.codecymru.drawbox.controller.BitmapDrawController
 import uk.codecymru.drawbox.controller.DrawBoxSubscription
 import uk.codecymru.drawbox.controller.DrawController
 import uk.codecymru.drawbox.model.CanvasTool
 
 @Composable
 internal fun ExpandedDrawingScreen(
-    drawController: DrawController,
+    drawController: BitmapDrawController,
 ) {
-    val previewSize = with (LocalDensity.current) { 250.dp.toPx() } // TODO fix this
-    val bitmap by remember { drawController.getBitmap(previewSize.toInt(), DrawBoxSubscription.FinishDrawingUpdate) }.collectAsState()
     val enableUndo by drawController.canUndo.collectAsState()
     val enableRedo by drawController.canRedo.collectAsState()
 
     Column {
-        Image(bitmap = bitmap, modifier = Modifier
-            .size(250.dp)
-            .border(1.dp, Color.Red), contentDescription = null)
+        DrawBox(
+            drawController,
+            false,
+            DrawBoxSubscription.FinishDrawingUpdate,
+            Modifier
+                .size(250.dp)
+                .border(1.dp, Color.Red)
+        )
 
         Column(modifier = Modifier.weight(4.5f, false)) {
-            Log.i("TAG_aaa", "ExpandedDrawingScreen: $bitmap")
             DrawBox(
                 controller = drawController,
                 modifier = Modifier
