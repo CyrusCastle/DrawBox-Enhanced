@@ -33,13 +33,13 @@ Building on the work of Mark Yavorskyi's [DrawBox](https://github.com/MarkYav/Dr
 
 Using Gradle Kotlin DSL:
 ```kotlin
-implementation("uk.codecymru.drawbox:DrawBox-Enhanced:2.0.1")
+implementation("uk.codecymru.drawbox:DrawBox-Enhanced:2.1.0")
 ```
 
 ## Usage
 
 ```kotlin
-val controller = remember { BitmapDrawController() }
+val controller = remember { DrawController() }
 DrawBox(drawController = controller, modifier = Modifier.fillMaxSize())
 ```
 
@@ -47,7 +47,7 @@ DrawBox(drawController = controller, modifier = Modifier.fillMaxSize())
 ```kotlin
 // To use the fill/eyedropper tools, the DrawController will need to be fed a coroutine scope
 val fillScope = rememberCoroutineScope()
-val controller = remember { BitmapDrawController(fillScope) }
+val controller = remember { DrawController(fillScope) }
 ```
 
 **Enabling undo/redo**
@@ -81,8 +81,39 @@ TextButton(onClick = { controller.canvasTool.value = CanvasTool.ERASER }) {
 
 **Importing a bitmap**
 ```kotlin
-val bitmap: ImageBitmap = (...)
+val bitmap: ImageBitmap = /* (...) */
 drawController.open(bitmap)
+```
+
+**Exporting a bitmap**
+```kotlin
+// This provides the up-to-date drawn bitmap
+controller.internalBitmap
+
+// As an example, on the JVM target we could save this via:
+TextButton(onClick = { saveImage(controller.internalBitmap) }) {
+    Text("Save")
+}
+
+fun saveImage(bitmap: ImageBitmap) {
+    val dialog = FileDialog(null as Frame?, "Save Image", FileDialog.SAVE)
+
+    dialog.file = "image.png"
+    dialog.isVisible = true
+
+    val directory = dialog.directory
+    val fileName = dialog.file
+
+    if (directory != null && fileName != null) {
+        val file = File(directory, fileName)
+
+        ImageIO.write(
+            bitmap.toAwtImage(),
+            "png",
+            file
+        )
+    }
+}
 ```
 
 **Creating another viewer**

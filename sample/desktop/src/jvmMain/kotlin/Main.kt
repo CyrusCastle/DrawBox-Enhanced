@@ -19,6 +19,8 @@ import uk.codecymru.drawbox.controller.DrawController
 import uk.codecymru.drawbox.controller.DrawBoxBackground
 import uk.codecymru.drawbox.controller.DrawBoxSubscription
 import uk.codecymru.drawbox.model.CanvasTool
+import java.awt.FileDialog
+import java.awt.Frame
 import java.io.File
 import javax.imageio.ImageIO
 
@@ -113,7 +115,7 @@ fun main() = application {
                             onValueChange = { controller.background.value = DrawBoxBackground.ColourBackground(color = Color.Blue, alpha = it) },
                             valueRange = 0f..1f
                         )
-                        TextButton(onClick = { saveImage(controller.internalBitmap, "test_output.png") }) {
+                        TextButton(onClick = { saveImage(controller.internalBitmap) }) {
                             Text("Save")
                         }
                     }
@@ -148,7 +150,22 @@ fun main() = application {
     }
 }
 
-fun saveImage(bitmap: ImageBitmap, fileName: String) {
-    val bufferedImage = bitmap.toAwtImage()
-    ImageIO.write(bufferedImage, "png", File(fileName))
+fun saveImage(bitmap: ImageBitmap) {
+    val dialog = FileDialog(null as Frame?, "Save Image", FileDialog.SAVE)
+
+    dialog.file = "image.png"
+    dialog.isVisible = true
+
+    val directory = dialog.directory
+    val fileName = dialog.file
+
+    if (directory != null && fileName != null) {
+        val file = File(directory, fileName)
+
+        ImageIO.write(
+            bitmap.toAwtImage(),
+            "png",
+            file
+        )
+    }
 }
