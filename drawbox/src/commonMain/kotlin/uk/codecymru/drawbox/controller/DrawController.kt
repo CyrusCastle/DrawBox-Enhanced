@@ -77,6 +77,6 @@ interface DrawController {
     /** Clear the canvas and history */
     fun reset()
 
-    /** Get the canvas as a bitmap */
-    fun getBitmap(size: Int? = null, subscription: DrawBoxSubscription): StateFlow<ImageBitmap>
+    ///** Get the canvas as a bitmap */
+    //fun getBitmap(size: Int? = null, subscription: DrawBoxSubscription): StateFlow<ImageBitmap>
 }
