@@ -115,6 +115,8 @@ class DrawController(private val fillScope: CoroutineScope? = null) {
             dstSize = size,
             paint = Paint()
         )
+
+        triggerRedraw()
     }
 
     /** Clear the canvas and history */
@@ -466,6 +468,7 @@ class DrawController(private val fillScope: CoroutineScope? = null) {
             _undoneActions.value += undone
             _actions.value -= undone
             redrawHistory()
+            triggerRedraw()
         }
     }
 
