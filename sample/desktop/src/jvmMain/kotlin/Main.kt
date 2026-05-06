@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import uk.codecymru.drawbox.box.DrawBox
+import uk.codecymru.drawbox.box.DrawBoxViewer
 import uk.codecymru.drawbox.controller.BitmapDrawController
 import uk.codecymru.drawbox.controller.DrawBoxBackground
 import uk.codecymru.drawbox.controller.DrawBoxSubscription
@@ -127,9 +128,8 @@ fun main() = application {
             Column(modifier = Modifier.weight(1f, false)) {
                 Text("DynamicUpdate:")
                 Spacer(modifier = Modifier.height(10.dp))
-                DrawBox(
+                DrawBoxViewer(
                     controller = controller,
-                    enableInteraction = false,
                     subscription = DrawBoxSubscription.DynamicUpdate,
                     modifier = Modifier.size(200.dp).border(width = 1.dp, color = Color.Red)
                 )
@@ -138,9 +138,8 @@ fun main() = application {
 
                 Text("FinishDrawingUpdate:")
                 Spacer(modifier = Modifier.height(10.dp))
-                DrawBox(
+                DrawBoxViewer(
                     controller = controller,
-                    enableInteraction = false,
                     subscription = DrawBoxSubscription.FinishDrawingUpdate,
                     modifier = Modifier.size(200.dp).border(width = 1.dp, color = Color.Red)
                 )

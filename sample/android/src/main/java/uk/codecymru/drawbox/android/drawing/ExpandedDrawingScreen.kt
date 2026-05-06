@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import uk.codecymru.drawbox.box.DrawBox
+import uk.codecymru.drawbox.box.DrawBoxViewer
 import uk.codecymru.drawbox.controller.BitmapDrawController
 import uk.codecymru.drawbox.controller.DrawBoxSubscription
 import uk.codecymru.drawbox.model.CanvasTool
@@ -27,9 +28,8 @@ internal fun ExpandedDrawingScreen(
     val enableRedo by drawController.canRedo.collectAsState(false)
 
     Column {
-        DrawBox(
+        DrawBoxViewer(
             drawController,
-            false,
             DrawBoxSubscription.FinishDrawingUpdate,
             Modifier
                 .size(250.dp)

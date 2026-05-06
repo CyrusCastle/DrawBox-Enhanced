@@ -60,3 +60,10 @@ fun DrawBox(
         )
     }
 }
+
+@Composable
+fun DrawBoxViewer(
+    controller: BitmapDrawController,
+    subscription: DrawBoxSubscription = DrawBoxSubscription.DynamicUpdate,
+    modifier: Modifier = Modifier
+) = DrawBox(controller, false, subscription, modifier)

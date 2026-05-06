@@ -85,6 +85,16 @@ val bitmap: ImageBitmap = (...)
 drawController.open(bitmap)
 ```
 
+**Creating another viewer**
+```kotlin
+// FinishDrawingUpdate means that this viewer won't show the user any in-progress strokes as they draw
+DrawBoxViewer(
+    controller = controller,
+    subscription = DrawBoxSubscription.FinishDrawingUpdate,
+    modifier = Modifier.size(200.dp).border(width = 1.dp, color = Color.Red)
+)
+```
+
 ## Examples
 
 Two useful samples of this library's basic usage can be found, written by Mark, in the sample package:
