@@ -1,27 +1,15 @@
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Slider
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.toAwtImage
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
@@ -30,13 +18,13 @@ import uk.codecymru.drawbox.controller.BitmapDrawController
 import uk.codecymru.drawbox.controller.DrawBoxBackground
 import uk.codecymru.drawbox.controller.DrawBoxSubscription
 import uk.codecymru.drawbox.model.CanvasTool
+import java.io.File
+import javax.imageio.ImageIO
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
         val fillScope = rememberCoroutineScope()
         val controller = remember { BitmapDrawController(fillScope) }
-        val bitmap by controller.getBitmap(null, DrawBoxSubscription.DynamicUpdate).collectAsState()
-        val bitmapFinishDrawingUpdate by controller.getBitmap(null, DrawBoxSubscription.FinishDrawingUpdate).collectAsState()
 
         val enableUndo by controller.canUndo.collectAsState()
         val enableRedo by controller.canRedo.collectAsState()
@@ -124,6 +112,9 @@ fun main() = application {
                             onValueChange = { controller.background.value = DrawBoxBackground.ColourBackground(color = Color.Blue, alpha = it) },
                             valueRange = 0f..1f
                         )
+                        TextButton(onClick = { saveImage(controller.internalBitmap, "test_output.png") }) {
+                            Text("Save")
+                        }
                     }
                 }
                 DrawBox(
@@ -136,22 +127,29 @@ fun main() = application {
             Column(modifier = Modifier.weight(1f, false)) {
                 Text("DynamicUpdate:")
                 Spacer(modifier = Modifier.height(10.dp))
-                Image(
-                    bitmap,
-                    contentDescription = "drawn bitmap",
-                    modifier = Modifier.size(200.dp).border(width = 1.dp, color = Color.Red),
+                DrawBox(
+                    controller = controller,
+                    enableInteraction = false,
+                    subscription = DrawBoxSubscription.DynamicUpdate,
+                    modifier = Modifier.size(200.dp).border(width = 1.dp, color = Color.Red)
                 )
 
                 Spacer(modifier = Modifier.height(50.dp))
 
                 Text("FinishDrawingUpdate:")
                 Spacer(modifier = Modifier.height(10.dp))
-                Image(
-                    bitmapFinishDrawingUpdate,
-                    contentDescription = "drawn bitmap",
-                    modifier = Modifier.size(200.dp).border(width = 1.dp, color = Color.Red),
+                DrawBox(
+                    controller = controller,
+                    enableInteraction = false,
+                    subscription = DrawBoxSubscription.FinishDrawingUpdate,
+                    modifier = Modifier.size(200.dp).border(width = 1.dp, color = Color.Red)
                 )
             }
         }
     }
+}
+
+fun saveImage(bitmap: ImageBitmap, fileName: String) {
+    val bufferedImage = bitmap.toAwtImage()
+    ImageIO.write(bufferedImage, "png", File(fileName))
 }
