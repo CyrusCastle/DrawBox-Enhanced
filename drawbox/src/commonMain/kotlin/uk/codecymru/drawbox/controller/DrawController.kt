@@ -46,6 +46,16 @@ class DrawController(private val fillScope: CoroutineScope? = null) {
     /** Can we currently redo? */
     val canRedo = _undoneActions.map { it.isNotEmpty() }
 
+    /////////////////
+    // LAYER STATE //
+    /////////////////
+
+    ///** What layer are we drawing on? Will return null if layers are disabled */
+    //val currentLayer: MutableStateFlow<Int?> = MutableStateFlow(null)
+    //
+    ///** What layer numbers have been drawn upon? */
+    //val drawnUponLayers: MutableStateFlow<List<Int>> = MutableStateFlow(emptyList())
+
     ////////////////////
     // BRUSH SETTINGS //
     ////////////////////
@@ -165,6 +175,27 @@ class DrawController(private val fillScope: CoroutineScope? = null) {
             }
         }.filter { it.points.isNotEmpty() }
     }
+
+    ///////////////////////
+    // HANDLING LAYERING //
+    ///////////////////////
+
+    //fun enableLayers(){
+    //    if (currentLayer.value != null) return
+    //
+    //    internalCanvas.enableZ()
+    //    drawnUponLayers.value += 0
+    //    currentLayer.value = 0
+    //}
+    //
+    //fun createLayer(){
+    //    val new = drawnUponLayers.value.maxOrNull()
+    //
+    //    if (new != null){
+    //        drawnUponLayers.value += new + 1
+    //        currentLayer.value = new + 1
+    //    }
+    //}
 
     ///////////////////////////
     // HANDLING INTERACTIONS //
