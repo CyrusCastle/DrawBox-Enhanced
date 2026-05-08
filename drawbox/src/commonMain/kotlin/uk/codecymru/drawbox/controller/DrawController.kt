@@ -134,6 +134,7 @@ class DrawController(private val fillScope: CoroutineScope? = null) {
         _actions.value = emptyList()
         _undoneActions.value = emptyList()
         redrawHistory()
+        triggerRedraw()
     }
 
     private fun deleteCroppedPoints() {
