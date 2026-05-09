@@ -26,19 +26,20 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun DrawingScreen() {
     val fillScope = rememberCoroutineScope()
-    val drawController = remember { DrawController(fillScope) }
+    val drawController = remember {
+        DrawController(
+            fillScope = fillScope,
+            startingColor = Color.Blue,
+            startingBackground = DrawBoxBackground.ColourBackground(color = Color.Red, alpha = 0.15f),
+            startingCanvasOpacity = 0.5f
+        )
+    }
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicturePreview()
     ) { bitmap ->
         if (bitmap != null) {
             drawController.open(bitmap.asImageBitmap())
         }
-    }
-
-    LaunchedEffect(Unit) {
-        drawController.color.value = Color.Blue
-        drawController.background.value = DrawBoxBackground.ColourBackground(color = Color.Red, alpha = 0.15f)
-        drawController.canvasOpacity.value = 0.5f
     }
 
     Column {

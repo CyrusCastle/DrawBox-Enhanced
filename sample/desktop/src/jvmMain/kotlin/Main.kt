@@ -27,7 +27,14 @@ import javax.imageio.ImageIO
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
         val fillScope = rememberCoroutineScope()
-        val controller = remember { DrawController(fillScope) }
+        val controller = remember {
+            DrawController(
+                fillScope = fillScope,
+                startingBackground = DrawBoxBackground.ColourBackground(color = Color.Blue, alpha = 0.15f),
+                startingCanvasOpacity = 0.5f,
+                startingColor = Color.Green
+            )
+        }
 
         val enableUndo by controller.canUndo.collectAsState(false)
         val enableRedo by controller.canRedo.collectAsState(false)
@@ -36,11 +43,6 @@ fun main() = application {
         val strokeWidth by controller.strokeWidth.collectAsState()
         val canvasOpacity by controller.canvasOpacity.collectAsState()
         val background by controller.background.collectAsState()
-
-        LaunchedEffect(Unit) {
-            controller.background.value = DrawBoxBackground.ColourBackground(color = Color.Blue, alpha = 0.15f)
-            controller.canvasOpacity.value = 0.5f
-        }
 
         Row {
             Column(modifier = Modifier.weight(2f, false)) {

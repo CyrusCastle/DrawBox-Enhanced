@@ -16,7 +16,15 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-class DrawController(private val fillScope: CoroutineScope? = null) {
+class DrawController(
+    private val fillScope: CoroutineScope? = null,
+    startingTool: CanvasTool = CanvasTool.BRUSH,
+    startingOpacity: Float = 1f,
+    startingStrokeWidth: Float = 10f,
+    startingColor: Color = Color.Red,
+    startingBackground: DrawBoxBackground = DrawBoxBackground.NoBackground,
+    startingCanvasOpacity: Float = 1f
+) {
     //////////////////////
     // CONNECTION STATE //
     //////////////////////
@@ -61,16 +69,16 @@ class DrawController(private val fillScope: CoroutineScope? = null) {
     ////////////////////
 
     /** What tool is currently being used (Brush, Eraser, etc.) */
-    val canvasTool: MutableStateFlow<CanvasTool> = MutableStateFlow(CanvasTool.BRUSH)
+    val canvasTool: MutableStateFlow<CanvasTool> = MutableStateFlow(startingTool)
 
     /** The current stroke width */
-    val opacity: MutableStateFlow<Float> = MutableStateFlow(1f)
+    val opacity: MutableStateFlow<Float> = MutableStateFlow(startingOpacity)
 
     /** The current stroke color */
-    val strokeWidth: MutableStateFlow<Float> = MutableStateFlow(10f)
+    val strokeWidth: MutableStateFlow<Float> = MutableStateFlow(startingStrokeWidth)
 
     /** The current stroke opacity */
-    val color: MutableStateFlow<Color> = MutableStateFlow(Color.Red)
+    val color: MutableStateFlow<Color> = MutableStateFlow(startingColor)
 
     ////////////////////
     // OTHER SETTINGS //
@@ -79,7 +87,7 @@ class DrawController(private val fillScope: CoroutineScope? = null) {
     val enabled: MutableStateFlow<Boolean> = MutableStateFlow(true)
 
     /** The opacity of the canvas background */
-    val canvasOpacity: MutableStateFlow<Float> = MutableStateFlow(1f)
+    val canvasOpacity: MutableStateFlow<Float> = MutableStateFlow(startingCanvasOpacity)
 
     /////////////////////////
     // BACKGROUND SETTINGS //
@@ -90,7 +98,7 @@ class DrawController(private val fillScope: CoroutineScope? = null) {
     val openedImage = _openedImage.asStateFlow()
 
     /** A background, perhaps, that goes BEHIND the canvas */
-    val background: MutableStateFlow<DrawBoxBackground> = MutableStateFlow(DrawBoxBackground.NoBackground)
+    val background: MutableStateFlow<DrawBoxBackground> = MutableStateFlow(startingBackground)
 
     // *********** //
     // * METHODS * //
