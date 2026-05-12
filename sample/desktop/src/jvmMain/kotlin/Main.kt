@@ -73,6 +73,9 @@ fun main() = application {
                             TextButton(onClick = { controller.canvasTool.value = CanvasTool.EYEDROPPER }) {
                                 Text("Eyedropper")
                             }
+                            TextButton(onClick = { controller.canvasTool.value = CanvasTool.SPRAY_CAN }) {
+                                Text("Spray")
+                            }
                         }
                     }
                 }
