@@ -52,8 +52,6 @@ class DrawController(
     private val _undoneActions = MutableStateFlow<List<DrawAction>>(emptyList())
     internal val _currentAction = MutableStateFlow<DrawnPath>(emptyList())
     private var lastPoint: Offset? = null
-    private var contentBounds: Rect = Rect.Zero
-    private var maxBrushSize: Float = 0f
 
     ///////////////////
     // DERIVED STATE //
@@ -304,22 +302,11 @@ class DrawController(
     }
 
     private fun Canvas.applyDrawAction(action: DrawAction){
-        val minX: Float
-        val maxX: Float
-        val minY: Float
-        val maxY: Float
-
         when (action) {
             is DrawAction.Path -> {
                 action.points.forEach { (from, to) ->
                     this.drawLine(from, to, action.paint)
                 }
-
-                minX = action.points.minOf { (first, second) -> minOf(first.x, second.x) }
-                maxX = action.points.maxOf { (first, second) -> maxOf(first.x, second.x) }
-
-                minY = action.points.minOf { (first, second) -> minOf(first.y, second.y) }
-                maxY = action.points.maxOf { (first, second) -> maxOf(first.y, second.y) }
             }
             is DrawAction.Fill -> {
                 this.drawPoints(
@@ -332,17 +319,6 @@ class DrawController(
                         isAntiAlias = false
                     }
                 )
-
-                // One of the only valid early returns here. Sometimes the user might press fill and it has nowhere to go.
-                if (action.points.isEmpty()){
-                    return
-                }
-
-                minX = action.points.minOf { (x, y) -> x }
-                maxX = action.points.maxOf { (x, y) -> x }
-
-                minY = action.points.minOf { (x, y) -> y }
-                maxY = action.points.maxOf { (x, y) -> y }
             }
             is DrawAction.Spray -> {
                 this.drawPoints(
@@ -350,20 +326,8 @@ class DrawController(
                     points = action.points,
                     paint = action.paint
                 )
-
-                minX = action.points.minOf { (x, y) -> x }
-                maxX = action.points.maxOf { (x, y) -> x }
-
-                minY = action.points.minOf { (x, y) -> y }
-                maxY = action.points.maxOf { (x, y) -> y }
             }
             is DrawAction.Shape -> {
-                minX = action.start.x
-                maxX = action.end.x
-
-                minY = action.start.y
-                maxY = action.end.y
-
                 when (action.shapeType){
                     CanvasTool.SHAPE_LINE -> {
                         this.drawLine(action.start, action.end, action.paint)
@@ -394,10 +358,6 @@ class DrawController(
                 }
             }
         }
-
-        maxBrushSize = maxOf(maxBrushSize, strokeWidth.value)
-        val actionBounds = Rect(minX, minY, maxX + maxBrushSize, maxY + maxBrushSize)
-        contentBounds = contentBounds.expandToInclude(actionBounds)
     }
 
     private fun drawSegment(from: Offset, to: Offset) {
