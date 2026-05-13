@@ -25,10 +25,8 @@ import kotlinx.coroutines.flow.collectLatest
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun DrawingScreen() {
-    val fillScope = rememberCoroutineScope()
     val drawController = remember {
         DrawController(
-            fillScope = fillScope,
             startingColor = Color.Blue,
             startingBackground = DrawBoxBackground.ColourBackground(color = Color.Red, alpha = 0.15f),
             startingCanvasOpacity = 0.5f

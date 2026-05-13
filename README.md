@@ -33,7 +33,7 @@ Building on the work of Mark Yavorskyi's [DrawBox](https://github.com/MarkYav/Dr
 
 Using Gradle Kotlin DSL:
 ```kotlin
-implementation("uk.codecymru.drawbox:DrawBox-Enhanced:2.1.1")
+implementation("uk.codecymru.drawbox:DrawBox-Enhanced:2.1.2")
 ```
 
 ## Usage
@@ -43,19 +43,11 @@ val controller = remember { DrawController() }
 DrawBox(drawController = controller, modifier = Modifier.fillMaxSize())
 ```
 
-**Enabling fill/eyedropper**
-```kotlin
-// To use the fill/eyedropper tools, the DrawController will need to be fed a coroutine scope
-val fillScope = rememberCoroutineScope()
-val controller = remember { DrawController(fillScope) }
-```
-
 **Configuring settings**
 ```kotlin
 // The following optional parameters can be set to 
 val controller = remember {
     DrawController(
-        fillScope = fillScope,
         startingTool = CanvasTool.BRUSH,
         startingOpacity = 1f,
         startingStrokeWidth = 10f,

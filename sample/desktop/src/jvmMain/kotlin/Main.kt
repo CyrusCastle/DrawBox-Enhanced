@@ -26,10 +26,8 @@ import javax.imageio.ImageIO
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
-        val fillScope = rememberCoroutineScope()
         val controller = remember {
             DrawController(
-                fillScope = fillScope,
                 startingBackground = DrawBoxBackground.ColourBackground(color = Color.Blue, alpha = 0.15f),
                 startingCanvasOpacity = 0.5f,
                 startingColor = Color.Green

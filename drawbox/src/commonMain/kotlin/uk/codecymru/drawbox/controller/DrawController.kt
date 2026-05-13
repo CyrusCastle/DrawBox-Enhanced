@@ -24,7 +24,6 @@ import uk.codecymru.drawbox.model.applyTo
 /**
  * The DrawController, it contains the bitmap & logic to draw onto bitmap
  *
- * @property fillScope A CoroutineScope for the controller to use when doing expensive operations i.e. fill tool
  * @property startingTool Optional, specifies starting tool out of CanvasTool enum
  * @property startingOpacity Optional alpha value for brushstrokes
  * @property startingStrokeWidth Optional, 0f leads to a hairline width
@@ -33,7 +32,6 @@ import uk.codecymru.drawbox.model.applyTo
  * @property startingCanvasOpacity Optional alpha value for the canvas as a whole
  */
 class DrawController(
-    private val fillScope: CoroutineScope? = null,
     startingTool: CanvasTool = CanvasTool.BRUSH,
     startingOpacity: Float = 1f,
     startingStrokeWidth: Float = 10f,
