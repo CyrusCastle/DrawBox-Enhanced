@@ -9,14 +9,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import uk.codecymru.drawbox.controller.DrawBoxSubscription
-import uk.codecymru.drawbox.model.CanvasTool
-import uk.codecymru.drawbox.model.DrawnPath
+import uk.codecymru.drawbox.model.DrawAction
 
 @Composable
 internal fun DrawBoxCanvas(
@@ -24,11 +22,7 @@ internal fun DrawBoxCanvas(
     version: Int,
     subscription: DrawBoxSubscription,
     enableInteraction: Boolean,
-    currentAction: DrawnPath,
-    color: Color,
-    strokeWidth: Float,
-    opacity: Float,
-    canvasTool: CanvasTool,
+    currentAction: DrawAction?,
     canvasOpacity: Float,
     onSizeChanged: (IntSize) -> Unit,
     onTap: (Offset) -> Unit,
@@ -61,10 +55,6 @@ internal fun DrawBoxCanvas(
                 bitmap = bitmap,
                 subscription = subscription,
                 currentAction = currentAction,
-                color = color,
-                strokeWidth = strokeWidth,
-                opacity = opacity,
-                canvasTool = canvasTool,
                 canvasOpacity = canvasOpacity
             )
         }
