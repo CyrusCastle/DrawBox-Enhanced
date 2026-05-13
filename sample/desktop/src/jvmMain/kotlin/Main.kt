@@ -77,6 +77,17 @@ fun main() = application {
                                 Text("Spray")
                             }
                         }
+                        Row {
+                            TextButton(onClick = { controller.canvasTool.value = CanvasTool.SHAPE_LINE }) {
+                                Text("Line")
+                            }
+                            TextButton(onClick = { controller.canvasTool.value = CanvasTool.SHAPE_RECT }) {
+                                Text("Rect")
+                            }
+                            TextButton(onClick = { controller.canvasTool.value = CanvasTool.SHAPE_CIRCLE }) {
+                                Text("Circle")
+                            }
+                        }
                     }
                 }
                 Row(modifier = Modifier.padding(end = 8.dp)) {
