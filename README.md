@@ -15,14 +15,14 @@ Building on the work of Mark Yavorskyi's [DrawBox](https://github.com/MarkYav/Dr
 - Fill tool
 - Eyedropper tool
 - Spray can tool
-- Shape tools (line, rectangle, oval)
+- Text tool
+- Shape tools (line, curve, rectangle, oval)
 - Undo, redo, or clear all brushstrokes
 - An easy implementation
 
 **Planned features:**
 - Maybe a select/translate tool
-- Maybe a text tool
-- Layers
+- Maybe layers
 
 [//]: # (## Demo)
 
@@ -33,7 +33,7 @@ Building on the work of Mark Yavorskyi's [DrawBox](https://github.com/MarkYav/Dr
 
 Using Gradle Kotlin DSL:
 ```kotlin
-implementation("uk.codecymru.drawbox:DrawBox-Enhanced:2.1.2")
+implementation("uk.codecymru.drawbox:DrawBox-Enhanced:2.3.0")
 ```
 
 ## Usage
@@ -48,7 +48,7 @@ DrawBox(drawController = controller, modifier = Modifier.fillMaxSize())
 // The following optional parameters can be set to 
 val controller = remember {
     DrawController(
-        startingTool = CanvasTool.BRUSH,
+        startingTool = CanvasTool.PENCIL,
         startingOpacity = 1f,
         startingStrokeWidth = 10f,
         startingColor = Color.Red,
@@ -78,13 +78,14 @@ IconButton(onClick = controller::redo, enabled = enableRedo) {
 val tool by controller.canvasTool.collectAsState()
 
 // To set the current tool, as an example:
-TextButton(onClick = { controller.canvasTool.value = CanvasTool.BRUSH }) {
-    Text("Brush")
+TextButton(onClick = { controller.canvasTool.value = CanvasTool.PENCIL }) {
+    Text("Pencil")
 }
 TextButton(onClick = { controller.canvasTool.value = CanvasTool.ERASER }) {
     Text("Eraser")
 }
-// etc...
+// etc... (PENCIL, BRUSH, ERASER, FILL, EYEDROPPER, SPRAY_CAN, TEXT, SHAPE_LINE, SHAPE_CURVE,
+// SHAPE_RECT, SHAPE_ROUNDED_RECT, SHAPE_CIRCLE, SHAPE_POLYGON)
 ```
 
 **Importing a bitmap**
