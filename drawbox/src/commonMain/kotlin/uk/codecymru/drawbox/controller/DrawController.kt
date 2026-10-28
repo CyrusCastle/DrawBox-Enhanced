@@ -222,7 +222,7 @@ class DrawController(
     // HANDLING INTERACTIONS //
     ///////////////////////////
 
-    internal fun onDragStart(offset: Offset) {
+    fun onDragStart(offset: Offset) {
         if (!enabled.value) return
 
         _undoneActions.value = emptyList()
@@ -230,14 +230,14 @@ class DrawController(
         drawSegment(offset, offset)
     }
 
-    internal fun onDrag(offset: Offset) {
+    fun onDrag(offset: Offset) {
         if (!enabled.value) return
 
         val start = _currentAction.value?.getFinalPoint() ?: offset
         drawSegment(start, offset)
     }
 
-    internal fun onDragEnd() {
+    fun onDragEnd() {
         if (!enabled.value) return
 
         if (_currentAction.value != null) {
@@ -247,7 +247,7 @@ class DrawController(
         _currentAction.value = null
     }
 
-    internal fun onTap(offset: Offset) {
+    fun onTap(offset: Offset) {
         if (!enabled.value) return
 
         when (canvasTool.value){
