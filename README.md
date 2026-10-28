@@ -141,8 +141,8 @@ Two useful samples of this library's basic usage can be found, written by Mark, 
 - [Desktop](sample/desktop/src/jvmMain/kotlin/Main.kt)
 
 For example projects, see the following:
-- ~[Farsigraphy](https://github.com/CyrusCastle/Farsigraphy/blob/main/composeApp/src/commonMain/kotlin/uk/codecymru/abjad/view/navigation/pages/flows/letter/shared/LetterSharedDraw.kt) (where it is used to allow users to practise drawing letters from the Farsi alphabet)~ (REPO CURRENTLY PRIVATE)
-- ~[PaintWindow](https://github.com/CyrusCastle/Cyrus-Website/blob/master/composeApp/src/webMain/kotlin/uk/cyruscastle/www/ui/system/window/windows/picture/PaintWindow.kt) (where it is used to emulate an old MS Paint on my personal website)~ (REPO CURRENTLY PRIVATE)
+- [Farsigraphy](https://github.com/CyrusCastle/Farsigraphy/blob/main/composeApp/src/commonMain/kotlin/uk/codecymru/abjad/view/navigation/pages/flows/letter/shared/LetterSharedDraw.kt) (where it is used to allow users to practise drawing letters from the Farsi alphabet)
+- [PaintWindow](https://github.com/CyrusCastle/Cyrus-Website/blob/master/composeApp/src/webMain/kotlin/uk/cyruscastle/www/ui/system/window/windows/picture/PaintWindow.kt) (where it is used to emulate an old MS Paint on my personal website)
 
 ## Author
 The original project was created by [Mark Yavorskyi](https://www.linkedin.com/in/mark-yavorskyi/), with the Enhanced edition being created by Cyrus Castle
@@ -155,6 +155,17 @@ I still have some aspects to improve and I will be happy if you share your feedb
 
 >Hope you enjoy it! \
 Mark
+
+## Alternatives
+These were the alternatives I found while I was working on this, I can't promise this list is up-to-date or comprehensive but might be a useful place to start (along with klibs.io).
+
+| Title | Author | Targets | Choose this if... |
+|---|---|---|---|
+| [DrawBox](https://klibs.io/project/MarkYav/DrawBox) | MarkYav | Android, JVM | Bare-bones version of this one, likely better performance all things considered |
+| [DrawBox-Enhanced](https://klibs.io/project/CyrusCastle/DrawBox-Enhanced) | CyrusCastle | Android, iOS, JVM, Wasm, JS | I made this one so that I could have access to internal functions for very specific projects, plus I wanted more tools |
+| [DrawBox](https://klibs.io/project/akshay2211/DrawBox) | akshay2211 | Android, iOS, JVM, Wasm, JS | You want a more professional diagramming/annotation editor |
+| [ArtMaker](https://klibs.io/project/Fbada006/ArtMaker) | Fbada006 | Android, iOS | You want a more artistic sketching-style editor |
+| [CanvasPainter](https://klibs.io/project/zeeshanali-k/CanvasPainter) | zeeshanali-k | Android, JVM, iOS, Wasm | You want the lightest possible painting canvas + color picker with minimal setup |
 
 ## License
 Licensed under the Apache License, Version 2.0, [click here for the full license](LICENSE.txt).
