@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toAwtImage
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
@@ -59,6 +60,9 @@ fun main() = application {
                     Column(modifier = Modifier.weight(2f, false)){
                         Text("Tool: $tool")
                         Row {
+                            TextButton(onClick = { controller.canvasTool.value = CanvasTool.PENCIL }) {
+                                Text("Pencil")
+                            }
                             TextButton(onClick = { controller.canvasTool.value = CanvasTool.BRUSH }) {
                                 Text("Brush")
                             }
@@ -74,16 +78,33 @@ fun main() = application {
                             TextButton(onClick = { controller.canvasTool.value = CanvasTool.SPRAY_CAN }) {
                                 Text("Spray")
                             }
+                            TextButton(onClick = { controller.canvasTool.value = CanvasTool.TEXT }) {
+                                Text("Text")
+                            }
                         }
                         Row {
                             TextButton(onClick = { controller.canvasTool.value = CanvasTool.SHAPE_LINE }) {
                                 Text("Line")
                             }
+                            TextButton(onClick = { controller.canvasTool.value = CanvasTool.SHAPE_CURVE }) {
+                                Text("Curve")
+                            }
                             TextButton(onClick = { controller.canvasTool.value = CanvasTool.SHAPE_RECT }) {
                                 Text("Rect")
                             }
+                            TextButton(onClick = { controller.canvasTool.value = CanvasTool.SHAPE_ROUNDED_RECT }) {
+                                Text("Rounded Rect")
+                            }
                             TextButton(onClick = { controller.canvasTool.value = CanvasTool.SHAPE_CIRCLE }) {
                                 Text("Circle")
+                            }
+                            TextButton(onClick = { controller.canvasTool.value = CanvasTool.SHAPE_POLYGON }) {
+                                Text("Polygon")
+                            }
+                            if (tool == CanvasTool.SHAPE_POLYGON) {
+                                TextButton(onClick = controller::finishPolygon) {
+                                    Text("Finish shape")
+                                }
                             }
                         }
                     }
@@ -119,6 +140,23 @@ fun main() = application {
                             }
                             TextButton(onClick = { controller.color.value = Color.Yellow }) {
                                 Text("Yellow")
+                            }
+                        }
+                    }
+                    Column(modifier = Modifier.weight(2f, true)) {
+                        Text("Font (for the Text tool)")
+                        Row {
+                            TextButton(onClick = { controller.fontFamily.value = null }) {
+                                Text("Default")
+                            }
+                            TextButton(onClick = { controller.fontFamily.value = FontFamily.Serif }) {
+                                Text("Serif")
+                            }
+                            TextButton(onClick = { controller.fontFamily.value = FontFamily.Monospace }) {
+                                Text("Monospace")
+                            }
+                            TextButton(onClick = { controller.fontFamily.value = FontFamily.Cursive }) {
+                                Text("Cursive")
                             }
                         }
                     }

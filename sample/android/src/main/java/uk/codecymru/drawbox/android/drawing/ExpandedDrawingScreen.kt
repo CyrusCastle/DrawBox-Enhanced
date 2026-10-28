@@ -55,6 +55,9 @@ internal fun ExpandedDrawingScreen(
                 IconButton(onClick = drawController::reset, enabled = enableUndo || enableRedo) {
                     Icon(imageVector = Icons.Default.Clear, contentDescription = "reset")
                 }
+                TextButton(onClick = { drawController.canvasTool.value = CanvasTool.PENCIL }) {
+                    Text("Pencil")
+                }
                 TextButton(onClick = { drawController.canvasTool.value = CanvasTool.BRUSH }) {
                     Text("Brush")
                 }
