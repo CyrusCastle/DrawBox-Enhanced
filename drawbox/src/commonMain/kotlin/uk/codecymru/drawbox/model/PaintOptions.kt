@@ -28,4 +28,21 @@ internal data class PaintOptions(
             }
         }
     }
+
+    fun createHaloPaint(): Paint? {
+        if (this.tool != CanvasTool.BRUSH) return null
+
+        return Paint().apply {
+            strokeWidth = this@PaintOptions.strokeWidth * BRUSH_HALO_WIDTH_MULTIPLIER
+            style = PaintingStyle.Stroke
+            strokeCap = StrokeCap.Round
+            strokeJoin = StrokeJoin.Round
+            color = this@PaintOptions.color
+            alpha = this@PaintOptions.opacity * BRUSH_HALO_ALPHA_MULTIPLIER
+            blendMode = BlendMode.SrcOver
+        }
+    }
 }
+
+private const val BRUSH_HALO_WIDTH_MULTIPLIER = 1.75f
+private const val BRUSH_HALO_ALPHA_MULTIPLIER = 0.3f
